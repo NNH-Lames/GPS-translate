@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Du Lịch Ẩm Thực Quận 4 — Presentation</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="logo">🍜 Quan4 Culinary Tourism</div>
+        <ul class="nav-links">
+            <li><a href="#overview">Tổng quan</a></li>
+            <li><a href="#startup">Khởi động</a></li>
+            <li><a href="#geofence">GPS/Geofence</a></li>
+            <li><a href="#content">POI Content</a></li>
+            <li><a href="#audio">Audio TTS</a></li>
+            <li><a href="#auth">Auth/RBAC</a></li>
+            <li><a href="#localization">i18n</a></li>
+            <li><a href="#offline">Offline/PWA</a></li>
+            <li><a href="#maps">Map Pack</a></li>
+            <li><a href="#admin">Admin/AI</a></li>
+            <li><a href="#patterns">Patterns</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Hệ Thống Du Lịch Ẩm Thực Quận 4</h1>
+        <p class="subtitle">PWA full-stack: Bản đồ tương tác, hướng dẫn âm thanh đa ngôn ngữ, hoạt động hoàn toàn
+            offline — khám phá ẩm thực đường phố Quận 4, TP.HCM</p>
+        <div class="badges">
+            <span class="badge">FastAPI + MongoDB</span>
+            <span class="badge">React 19.2 + Vite 7 PWA</span>
+            <span class="badge">MapLibre + PMTiles</span>
+            <span class="badge">Edge-TTS (Microsoft)</span>
+            <span class="badge">Gemini 2.5 Flash / ProxyPal</span>
+            <span class="badge">Offline-First</span>
+            <span class="badge">Low-Cost Core</span>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <section>
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="value">10</div>
+                <div class="label">Mounted FastAPI Routers</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">52</div>
+                <div class="label">Admin + Owner APIs (40 admin + 12 owner)</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">32</div>
+                <div class="label">RBAC Permissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">4</div>
+                <div class="label">Audio Tiers</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">3</div>
+                <div class="label">Content Fallback Layers</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">4</div>
+                <div class="label">Offline Defense Layers</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">3</div>
+                <div class="label">Map Modes</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">$0*</div>
+                <div class="label">Open-Source Core</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview">
+        <div class="section-header">
+            <div class="icon" style="background:#fff3e0;color:var(--primary);">🏗️</div>
+            <div>
+                <div class="section-num">Chapter 00</div>
+                <h2>Kiến Trúc Tổng Quan</h2>
+            </div>
+        </div>
+
+        <p style="margin-bottom:1rem;color:var(--text-secondary);">Runtime backend hiện mount 10 router lane:
+            <code>content</code>, <code>audio</code>, <code>admin</code>, <code>owner</code>,
+            <code>ai_advisor</code>, <code>analytics</code>, <code>localization</code>, <code>maps</code>,
+            <code>runtime_observability</code> và <code>ui_i18n</code>. Các lane dùng chung MongoDB, Redis,
+            static/runtime storage nhưng boundary vẫn tách theo router/service/store.</p>
+
+        <div class="arch-grid">
+            <div class="arch-module">
+                <div class="mod-icon">📍</div>
+                <div class="mod-name">content</div>
+                <div class="mod-desc">POI CRUD, delta sync, localization hydrate, activation gate</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">🎧</div>
+                <div class="mod-name">audio</div>
+                <div class="mod-desc">Edge-TTS, GoogleTranslator, task manager, voices, pack manifest</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">🛡️</div>
+                <div class="mod-name">admin + owner</div>
+                <div class="mod-desc">Cookie auth, RBAC, owner review, notifications, PII encryption</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">📈</div>
+                <div class="mod-name">analytics</div>
+                <div class="mod-desc">Consent-gated collect API, Redis presence, Mongo read models</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">🧠</div>
+                <div class="mod-name">ai_advisor</div>
+                <div class="mod-desc">Gemini 2.5 Flash / ProxyPal, quota 10/ngày cho owner, provider-aware errors</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">🌐</div>
+                <div class="mod-name">localization</div>
+                <div class="mod-desc">On-demand, hotset, warmup, public-English readiness gate</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">🧩</div>
+                <div class="mod-name">ui_i18n</div>
+                <div class="mod-desc">UI bundles, source_hash, pending/ready payload, long-tail MT</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">🗺️</div>
+                <div class="mod-name">maps</div>
+                <div class="mod-desc">Static-first manifest, PMTiles, glyphs, sprites, path guard</div>
+            </div>
+            <div class="arch-module">
+                <div class="mod-icon">📍</div>
+                <div class="mod-name">runtime_observability</div>
+                <div class="mod-desc">Public location ingest riêng, rate limit và cửa sổ quan sát cho admin</div>
+            </div>
+        </div>
+
+        <h3 style="margin:1.5rem 0 .8rem;">MongoDB Collections</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Collection</th>
+                        <th>Module</th>
+                        <th>Mục đích</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>POI</code></td>
+                        <td>content</td>
+                        <td>Dữ liệu POI gốc (tiếng Việt), hình ảnh, tọa độ, <code>trigger_radius</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>poi_localizations</code></td>
+                        <td>localization</td>
+                        <td>Bản dịch + audio_url theo (poi_id, lang). Compound index.</td>
+                    </tr>
+                    <tr>
+                        <td><code>audio_tasks</code></td>
+                        <td>audio</td>
+                        <td>Snapshot/control state cho audio task, restart recovery, heartbeat, TTL retention</td>
+                    </tr>
+                    <tr>
+                        <td><code>content_dataset_versions</code></td>
+                        <td>content</td>
+                        <td>Version token cho <code>/poi/load-all</code>, ETag và delta sync cursor</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin_users</code></td>
+                        <td>admin</td>
+                        <td>Tài khoản admin/owner + hashed password + role + <code>is_poi_owner_verified</code> + PII encrypted</td>
+                    </tr>
+                    <tr>
+                        <td><code>roles</code></td>
+                        <td>admin</td>
+                        <td>Dynamic roles + permission arrays. 4 default roles seeded.</td>
+                    </tr>
+                    <tr>
+                        <td><code>audit_logs</code></td>
+                        <td>admin</td>
+                        <td>Nhật ký hành động (action, user_id, resource, timestamp)</td>
+                    </tr>
+                    <tr>
+                        <td><code>poi_owner_registrations</code></td>
+                        <td>admin</td>
+                        <td>Đơn đăng ký chủ quán (pending → approved/rejected) + <code>admin_note</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>poi_submissions</code></td>
+                        <td>admin</td>
+                        <td>Tạo/cập nhật POI từ owner chờ duyệt, giữ review status và <code>admin_note</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>owner_notifications</code></td>
+                        <td>admin</td>
+                        <td>Thông báo review cho owner, đọc/chưa đọc, trang chi tiết trong owner portal</td>
+                    </tr>
+                    <tr>
+                        <td><code>ai_usage_limits</code></td>
+                        <td>ai_advisor</td>
+                        <td>Rate limit: {user_id, date, count}. Reset daily.</td>
+                    </tr>
+                    <tr>
+                        <td><code>analytics_*</code></td>
+                        <td>analytics</td>
+                        <td>Devices, sessions, events, hourly/daily metrics, jobs và read models dashboard</td>
+                    </tr>
+                    <tr>
+                        <td><code>localization_rate_limits</code></td>
+                        <td>localization</td>
+                        <td>Rate limit shared-state cho on-demand translation/TTS, TTL theo cửa sổ quota</td>
+                    </tr>
+                    <tr>
+                        <td><code>ui_translation_bundles</code></td>
+                        <td>ui_i18n</td>
+                        <td>Cache bundle UI theo <code>namespace + locale + source_hash</code>, trạng thái <code>pending/ready</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>runtime_location_hourly</code></td>
+                        <td>runtime_observability</td>
+                        <td>Read model vị trí runtime theo cửa sổ giờ, tách khỏi analytics consent lane</td>
+                    </tr>
+                    <tr>
+                        <td><code>MenuItem</code></td>
+                        <td>content</td>
+                        <td>Menu items cho POI</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- STARTUP -->
+    <section id="startup">
+        <div class="section-header">
+            <div class="icon" style="background:#e8f5e9;color:var(--success);">🚀</div>
+            <div>
+                <div class="section-num">Chapter 01–02</div>
+                <h2>Luồng Khởi Động (Backend + Frontend)</h2>
+            </div>
+        </div>
+
+        <h3>Backend Startup Sequence</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>Tầng 1 — Security + Bootstrap Guard</h4>
+                <p>Kiểm tra <code>JWT_SECRET</code>, <code>REFRESH_TOKEN_SECRET</code>, <code>SECRET_KEY</code> ở non-dev
+                    và validate <code>SUPERADMIN_BOOTSTRAP_MODE</code>. Sai mode hoặc thiếu secret là fail-fast ngay.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Tầng 2 — Database / Cache / Media Readiness</h4>
+                <p><code>connect_db()</code> → <code>assert_transaction_capability()</code> → optional
+                    <code>media_storage.check_backend_health()</code> khi media đi qua S3-compatible backend.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Tầng 3 — Seeding + Runtime Prep</h4>
+                <p><code>admin_service.ensure_roles()</code> và <code>ensure_super_admin()</code>, sau đó
+                    <code>verify_runtime_storage()</code> hoặc <code>ensure_runtime_storage()</code> tùy môi trường.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Tầng 4 — Recovery + Background Workers</h4>
+                <p>Refresh transaction readiness, start readiness loop, recover audio task sau restart, load recent
+                    tasks, start maintenance loop, ensure runtime observability indexes rồi bật analytics worker và media cleanup worker.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Gắn 10 Routers + /static + readiness</h4>
+                <p>content, audio, admin, owner, ai_advisor, analytics, localization, maps,
+                    runtime_observability, ui_i18n — kèm
+                    <code>/static</code>, <code>/health</code>, <code>/health/ready</code>.</p>
+            </div>
+        </div>
+
+        <h3 style="margin-top:2rem;">Frontend Startup Flow</h3>
+        <div class="flow">
+            <span class="flow-step">SW Register</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step alt">React Router (catch-all)</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step warning">Splash Screen</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">Chọn ngôn ngữ</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step success">Parallel Load</span>
+        </div>
+
+        <div class="card-grid" style="margin-top:1rem;">
+            <div class="card">
+                <h3>🧭 Best-Effort Locate</h3>
+                <p><code>requestBestEffortPosition()</code> ưu tiên cached result nếu còn tốt; budget mặc định 15s,
+                    cache age 30s, accuracy chấp nhận tới 100m.</p>
+            </div>
+            <div class="card">
+                <h3>💾 Offline Snapshot</h3>
+                <p><code>getOfflinePOIs(lang)</code> và cached UI bundles từ IndexedDB giúp app render ngay cả khi
+                    backend chưa phản hồi.</p>
+            </div>
+            <div class="card">
+                <h3>🌐 Delta Sync Content</h3>
+                <p><code>loadAllPOIs(lang)</code> dùng <code>ETag</code>, <code>dataset_version</code> và
+                    <code>updated_after</code> để full sync hoặc delta sync rồi cập nhật IDB.</p>
+            </div>
+            <div class="card">
+                <h3>🔥 Hotset Readiness</h3>
+                <p><code>prepare-hotset</code> lấy tối đa 10 POI gần nhất trong 1.5km; thực tế switch chỉ coi là sẵn
+                    sàng khi 3 POI bắt buộc đã được cache.</p>
+            </div>
+            <div class="card">
+                <h3>🧩 UI Bundle + Warmup</h3>
+                <p>Startup coordinator tách readiness giữa content locale và UI bundle. App có thể quick-start bằng
+                    English trong khi <code>/warmup</code> và <code>/ui-bundles</code> tiếp tục hoàn tất dưới nền.</p>
+            </div>
+        </div>
+
+        <div class="highlight info">
+            <strong>Startup probe:</strong> trước khi kết luận backend đang lỗi mạng, frontend thử chuỗi
+            <code>/api/v1/audio/languages</code> và <code>/api/v1/maps/offline-options</code> với timeout 2.5 giây,
+            tối đa 2 lần trong cửa sổ 8 giây.
+        </div>
+    </section>
+
+    <!-- GEOFENCE -->
+    <section id="geofence">
+        <div class="section-header">
+            <div class="icon" style="background:#e3f2fd;color:var(--info);">📡</div>
+            <div>
+                <div class="section-num">Chapter 04</div>
+                <h2>GPS + Geofence + Audio Narration</h2>
+            </div>
+        </div>
+
+        <p style="margin-bottom:1.5rem;color:var(--text-secondary);">Luồng geofence hiện xử lý đồng thời nhiễu GPS,
+            tiết kiệm pin, chuyển ngôn ngữ giữa chừng và fallback audio nhiều tầng. Ba hằng số dễ nhớ nhất là
+            debounce 3 giây, GPS throttle 5 giây và cooldown 5 phút.</p>
+
+        <h3>4 Giai Đoạn Xử Lý</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>Giai đoạn 1 — GPS Collection (LocationService)</h4>
+                <p><code>watchPosition()</code> liên tục → <strong>throttle 5s</strong> để tránh render/sort liên tục.
+                    Khi user bấm locate, app dùng thêm <code>requestBestEffortPosition()</code> để tận dụng cached fix nếu đủ tốt.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Giai đoạn 2 — Zone Detection (GeofenceEngine)</h4>
+                <p><code>checkGeofences(pos)</code>: <code>turf.distance()</code> tính khoảng cách. ≤ radius (default
+                    30m) → pendingEntries. Ra ngoài zone đã trigger → cooldown 5 phút.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Giai đoạn 3 — Audio Decision (Safety Reconcile 5s)</h4>
+                <p><code>_reconcileLoop()</code> được gọi khi có position update và còn có safety reconcile 5s:
+                    confirm ENTER sau 3s debounce → chọn POI theo <code>audio_priority</code> rồi đến khoảng cách →
+                    đẩy NarrationEngine.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Giai đoạn 4 — Audio Playback (4-Tier Hybrid)</h4>
+                <p>NarrationEngine → AudioQueueManager (single-slot priority queue) →
+                    <code>playWithFallback()</code>. Kết quả on-demand cũ sẽ bị bỏ nếu user đã đổi ngôn ngữ trong lúc chờ.</p>
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">4-Tier Hybrid Audio</h3>
+        <div class="tier-list">
+            <div class="tier-item">
+                <div class="tier-label" style="background:#2e7d32;">Tier 1</div>
+                <div class="tier-content">
+                    <strong>Pre-generated Audio (0ms)</strong>
+                    <span><code>playAudioUrl(poi.audio_url)</code> → SW CacheFirst → phát từ cache. Điều kiện: có
+                        <code>audio_url</code>, không phải <code>is_fallback</code>.</span>
+                </div>
+            </div>
+            <div class="tier-item">
+                <div class="tier-label" style="background:#1565c0;">Tier 1.5</div>
+                <div class="tier-content">
+                    <strong>On-demand Translate + TTS (2-5s)</strong>
+                    <span><code>POST /localizations/on-demand</code> → Backend dịch + Edge-TTS → lưu → trả audio_url
+                        mới. Khi POI có <code>is_fallback=true</code>.</span>
+                </div>
+            </div>
+            <div class="tier-item">
+                <div class="tier-label" style="background:#e65100;">Tier 2</div>
+                <div class="tier-content">
+                    <strong>Cloud TTS Stream (3-8s)</strong>
+                    <span><code>POST /audio/tts</code> → Edge-TTS synthesis → stream MP3 trực tiếp. Disk cache cho lần
+                        sau.</span>
+                </div>
+            </div>
+            <div class="tier-item">
+                <div class="tier-label" style="background:#616161;">Tier 3</div>
+                <div class="tier-content">
+                    <strong>Local Speech Synthesis (0ms)</strong>
+                    <span><code>window.speechSynthesis</code> — offline fallback cuối cùng. Chất lượng thấp hơn nhưng
+                        luôn khả dụng.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <strong>Background Prefetch:</strong> Song song, <code>_prefetchNearbyLocalizations(pos)</code> quét dataset
+            POI đang có trong store, lọc POI <code>is_fallback=true</code> trong 500m, enqueue tối đa 3 POI mỗi đợt
+            rồi drain tuần tự. Đợt mới chỉ mở sau tối thiểu 30 giây; nếu gặp <code>429</code> thì backoff
+            30s → 60s → 120s ... tối đa 10 phút.
+        </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section id="content">
+        <div class="section-header">
+            <div class="icon" style="background:#fce4ec;color:#c62828;">📍</div>
+            <div>
+                <div class="section-num">Chapter 05</div>
+                <h2>Module Content — POI Lifecycle</h2>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>GET /poi/load-all</h3>
+                <p>API nặng nhất. Hỗ trợ full sync hoặc delta sync bằng <code>If-None-Match</code> +
+                    <code>updated_after</code>; trả thêm <code>dataset_version</code>, <code>sync_mode</code>,
+                    <code>removed_poi_ids</code>, <code>sync_cursor</code>. Active public lane chỉ trả POI đã sẵn sàng tiếng Anh.
+                </p>
+            </div>
+            <div class="card">
+                <h3>GET /poi/nearby</h3>
+                <p>Ưu tiên <code>$geoNear</code> trên index không gian để lấy POI trong bán kính; nếu geo query lỗi thì
+                    fallback sang Haversine sort in-memory. Dùng cho hotset và nearby discovery.</p>
+            </div>
+            <div class="card">
+                <h3>Create / Update POI</h3>
+                <p>Lưu text trước, sau đó queue audio cho 5 ngôn ngữ ưu tiên. Khi mô tả đổi, hệ thống xóa
+                    <code>audio_url</code> cũ, set <code>audio_status="processing"</code>, tạm giữ
+                    <code>is_active=false</code> và nhớ <code>activation_requested</code>.</p>
+            </div>
+            <div class="card">
+                <h3>Delete / Activation Gate</h3>
+                <p>Xóa POI theo transaction khi có thể, cascade sang <code>poi_localizations</code>, enqueue media
+                    cleanup và touch dataset version. Bật public mà chưa ready English/audio thì vẫn phải regenerate trước.</p>
+            </div>
+        </div>
+
+        <div class="highlight info">
+            <strong>Runtime audio decoration:</strong> trước khi trả frontend, backend gắn
+            <code>?v={updated_at}&amp;l={lang}</code> vào <code>audio_url</code> để vừa cache-bust khi file đổi,
+            vừa giúp Service Worker shard cache theo ngôn ngữ.
+        </div>
+
+        <h3 style="margin-top:1.5rem;">3-Tier Content Fallback</h3>
+        <div class="tier-list">
+            <div class="tier-item">
+                <div class="tier-label" style="background:#2e7d32;">Tier 1</div>
+                <div class="tier-content">
+                    <strong>Ngôn ngữ yêu cầu</strong>
+                    <span>Trả đúng ngôn ngữ user chọn nếu trong <code>poi_localizations</code> đã có bản dịch và audio.</span>
+                </div>
+            </div>
+            <div class="tier-item">
+                <div class="tier-label" style="background:#1565c0;">Tier 2</div>
+                <div class="tier-content">
+                    <strong>English Fallback</strong>
+                    <span>Fallback chung cho khách quốc tế. Nếu rơi xuống tầng này thì frontend biết đây là nội dung thay thế.</span>
+                </div>
+            </div>
+            <div class="tier-item">
+                <div class="tier-label" style="background:#e65100;">Tier 3</div>
+                <div class="tier-content">
+                    <strong>Nguyên bản tiếng Việt</strong>
+                    <span>Lớp phòng thủ cuối. <code>audio_url = null</code> để frontend chuyển sang on-demand hoặc tier audio khác.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUDIO -->
+    <section id="audio">
+        <div class="section-header">
+            <div class="icon" style="background:#f3e5f5;color:#7b1fa2;">🎧</div>
+            <div>
+                <div class="section-num">Chapter 06</div>
+                <h2>Module Audio / TTS</h2>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>TTSService — Nhà Máy Audio</h3>
+                <ul>
+                    <li><code>translate_text()</code>: <strong>deep-translator</strong> (GoogleTranslator) — miễn phí
+                    </li>
+                    <li><code>generate_audio()</code>: dịch → <strong>Edge-TTS</strong> synthesis → lưu MP3</li>
+                    <li>Cache key: <code>MD5(f"{text}:{lang}")</code> → file tồn tại = Cache HIT, zero cost</li>
+                    <li>5 preferred voices: vi (HoaiMyNeural), en (JennyNeural), zh (XiaoxiaoNeural), ja (NanamiNeural),
+                        ko (SunHiNeural)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>AudioTaskManager — Background Engine</h3>
+                <ul>
+                    <li>Parallel generate với <strong>Semaphore max=3</strong></li>
+                    <li>SSE real-time: <code>GET /admin/audio-tasks/stream</code></li>
+                    <li>Frontend: progress bar + Pause/Resume/Cancel</li>
+                    <li>Status: queued → running → paused → completed/failed/cancelled</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>POST /audio/tts (Tier 2 API)</h3>
+                <ul>
+                    <li>Text → Edge-TTS → stream MP3 trực tiếp</li>
+                    <li>Disk cache: <code>X-Cache: HIT/MISS</code></li>
+                    <li><code>X-Static-Url</code>: versioned URL cho SW cache</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>GET /audio/pack-manifest</h3>
+                <ul>
+                    <li>Quét tất cả MP3 cho 1 lang</li>
+                    <li>Tính SHA-256 hash per file</li>
+                    <li>Return: <code>{lang, pack_version, total_files, total_bytes, files[]}</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Audio Generation Pipeline</h3>
+        <div class="flow">
+            <span class="flow-step">Source Text (VN)</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step alt">deep-translator</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step warning">Translated Text</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">MD5 Hash Check</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step success">Edge-TTS</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">MP3 File</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step alt">Upsert Localization</span>
+        </div>
+    </section>
+
+    <!-- AUTH -->
+    <section id="auth">
+        <div class="section-header">
+            <div class="icon" style="background:#efebe9;color:#4e342e;">🛡️</div>
+            <div>
+                <div class="section-num">Chapter 07</div>
+                <h2>Authentication & RBAC</h2>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>🔐 httpOnly Cookie Auth</h3>
+                <ul>
+                    <li><code>access_token</code>: JWT, 30 phút, httpOnly, SameSite=Lax, Secure</li>
+                    <li><code>refresh_token</code>: JWT, 7 ngày, httpOnly</li>
+                    <li>JS không đọc được (chống XSS), SameSite chống CSRF</li>
+                    <li>Dual-mode: Cookie (browser) + Bearer header (API/mobile fallback)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🔑 Dynamic RBAC</h3>
+                <ul>
+                    <li><strong>Static:</strong> 32 permissions / 9 domains (code)</li>
+                    <li><strong>Dynamic:</strong> Roles in MongoDB (DB)</li>
+                    <li>Route Guards: <code>require_permission("poi:delete")</code></li>
+                    <li>JWT payload chứa permissions → không cần query DB cho hầu hết request</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Permission Domains (9)</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>poi</code></td>
+                        <td>read, create, update, delete, approve, toggle</td>
+                    </tr>
+                    <tr>
+                        <td><code>menu</code></td>
+                        <td>read, create, update, delete</td>
+                    </tr>
+                    <tr>
+                        <td><code>user</code></td>
+                        <td>read, create, update, delete</td>
+                    </tr>
+                    <tr>
+                        <td><code>role</code></td>
+                        <td>read, create, update, delete</td>
+                    </tr>
+                    <tr>
+                        <td><code>analytics</code></td>
+                        <td>view, export, view_own</td>
+                    </tr>
+                    <tr>
+                        <td><code>audit</code></td>
+                        <td>read, manage</td>
+                    </tr>
+                    <tr>
+                        <td><code>system</code></td>
+                        <td>config, logs, backup</td>
+                    </tr>
+                    <tr>
+                        <td><code>owner</code></td>
+                        <td>register, access, submit_poi, manage_own_poi</td>
+                    </tr>
+                    <tr>
+                        <td><code>content</code></td>
+                        <td>moderate, publish</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Default Roles</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Priority</th>
+                        <th>Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>super_admin</strong></td>
+                        <td>0 (cao nhất)</td>
+                        <td>TẤT CẢ 32 permissions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>admin</strong></td>
+                        <td>1</td>
+                        <td>POI/Menu/User + Analytics + Audit + Content</td>
+                    </tr>
+                    <tr>
+                        <td><strong>poi_owner</strong></td>
+                        <td>10</td>
+                        <td>poi:read + owner:access/submit_poi/manage_own_poi + menu:read/create/update + analytics:view_own</td>
+                    </tr>
+                    <tr>
+                        <td><strong>user</strong></td>
+                        <td>100</td>
+                        <td>poi:read + menu:read + owner:register</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight">
+            <strong>PII Encryption:</strong> Số CCCD chủ quán → <code>encrypt_pii()</code> = Fernet encryption
+            (<code>"v1:" + encrypted</code>) → lưu DB. Sau 180 ngày → auto redacted. Decrypt chỉ khi cần, return None on
+            failure (never leak).
+        </div>
+        <div class="highlight info" style="margin-top:1rem;">
+            <strong>Owner Gate:</strong> Owner portal không chỉ dựa vào role <code>poi_owner</code>. Các lane nghiệp vụ
+            còn yêu cầu <code>is_poi_owner_verified === true</code>; nếu chưa xác minh thì frontend chỉ đi lane
+            <code>/owner/registration-status</code> và màn thông báo tương ứng.
+        </div>
+    </section>
+
+    <!-- LOCALIZATION -->
+    <section id="localization">
+        <div class="section-header">
+            <div class="icon" style="background:#e0f7fa;color:var(--accent);">🌐</div>
+            <div>
+                <div class="section-num">Chapter 08</div>
+                <h2>Localization + UI Bundles — Đa Ngôn Ngữ 2 Làn</h2>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>Làn 1 — Content Locale</h3>
+                <p><code>GET /poi/load-all?lang=ja</code> hydrate <code>poi_localizations</code> theo
+                    target → English → Vietnamese. Đây là lane nội dung POI, độc lập với UI text.</p>
+            </div>
+            <div class="card">
+                <h3>Làn 1.1 — Hotset</h3>
+                <p><code>prepare-hotset</code> làm nóng tối đa 10 POI gần nhất trong 1.5km. Frontend chỉ coi switch là
+                    ready khi 3 POI bắt buộc đã có đủ content/audio trong cache.</p>
+            </div>
+            <div class="card">
+                <h3>Làn 1.2 — On-demand + Warmup</h3>
+                <p><code>POST /localizations/on-demand</code> xử lý reactive theo POI; <code>POST /warmup</code> chạy
+                    full-corpus dưới nền. Khi bị limiter chặn, backend trả <code>Retry-After</code> để frontend backoff đúng nhịp.</p>
+            </div>
+            <div class="card">
+                <h3>Làn 2 — UI Bundles</h3>
+                <p><code>GET /api/v1/ui-bundles/{locale}</code> phục vụ namespace <code>public-ui</code>. 5 ngôn ngữ
+                    top-level (<code>en, vi, zh, ja, ko</code>) có bundle tĩnh; long-tail locale trả English fallback
+                    với <code>status: pending</code> và <code>source_hash</code> trong lúc server dịch nền.</p>
+            </div>
+        </div>
+
+        <div class="highlight success">
+            <strong>Điểm mấu chốt:</strong> đổi ngôn ngữ bây giờ không chỉ là chờ bản dịch POI. Frontend chỉ coi một
+            language switch là hoàn tất khi cả <strong>content hotset</strong> lẫn <strong>UI bundle</strong> đều ready.
+            Vì vậy app có thể quick-start bằng English, sau đó chuyển hẳn sang ngôn ngữ đích khi cả hai làn đã đủ dữ liệu.
+        </div>
+    </section>
+
+    <!-- OFFLINE -->
+    <section id="offline">
+        <div class="section-header">
+            <div class="icon" style="background:#e8eaf6;color:#283593;">📴</div>
+            <div>
+                <div class="section-num">Chapter 09</div>
+                <h2>Offline / PWA — 4 Lớp Phòng Ngự</h2>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>Lớp 1 — Service Worker Strategies</h3>
+                <p><code>sw.js</code> dùng <code>injectManifest</code> + Workbox. Chiến lược chính:</p>
+                <ul>
+                    <li>POI data: <strong>NetworkFirst</strong> 8s, cache <code>poi-load-all-cache</code>, 15min TTL
+                    </li>
+                    <li>Audio: <strong>CacheFirst</strong> per-lang, cache <code>audio-cache-lang-{lang}</code></li>
+                    <li>Images + optional runtime chunks: <strong>CacheFirst</strong>, quota-aware purge</li>
+                    <li>Map pack: custom immutable cache + activate/deactivate message lane</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Lớp 2 — Language Sharding + Build Sync</h3>
+                <p>Mỗi ngôn ngữ là một shard cache riêng; đồng thời runtime chunk cache riêng giúp public app không bị
+                    kẹt asset cũ sau deploy.</p>
+                <ul>
+                    <li>Max 300 files / ngôn ngữ</li>
+                    <li>Max 3 ngôn ngữ đồng thời</li>
+                    <li>LRU eviction: xóa lang ít dùng nhất</li>
+                    <li><code>APP_BUILD_SYNC</code> dọn <code>public-optional-chunk-cache</code> khi build đổi</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Lớp 3 — IndexedDB (Quan4DB v2)</h3>
+                <p>Lưu <code>pois_by_lang</code> và cached UI bundles để app còn dữ liệu ngay cả khi SW/network miss.</p>
+                <ul>
+                    <li>Offline Fallback: target → en → vi</li>
+                    <li>Bỏ qua <code>is_fallback=true</code> trong target lane</li>
+                    <li>User không bao giờ thấy màn hình trống</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Lớp 4 — Offline Packs</h3>
+                <p>Bundle explicit theo ngôn ngữ đang chọn gồm 4 phần: map + POI + images + audio.</p>
+                <ul>
+                    <li>Install tuần tự: map → POI → images → audio</li>
+                    <li>SHA-256 verify cho từng asset trước khi activate</li>
+                    <li>Pack cache tách biệt khỏi runtime cache</li>
+                    <li>Action summary: <code>updateAvailable</code>, <code>repairRequired</code>, <code>poiMissing</code></li>
+                    <li><code>purgeOnQuotaError: true</code> → hy sinh runtime khi disk đầy</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">SW Message Protocol</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Message</th>
+                        <th>Từ</th>
+                        <th>Mục đích</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>SET_ACTIVE_LANGUAGE</code></td>
+                        <td>Frontend</td>
+                        <td>Ghim shard ngôn ngữ đang dùng để eviction ưu tiên giữ đúng audio cache hiện hành</td>
+                    </tr>
+                    <tr>
+                        <td><code>APP_BUILD_SYNC</code></td>
+                        <td>Runtime build sync</td>
+                        <td>Dọn optional chunk cache cũ sau deploy để public shell không bị mix asset giữa hai build</td>
+                    </tr>
+                    <tr>
+                        <td><code>AUDIO_PACK_ACTIVATE</code></td>
+                        <td>AudioPackService</td>
+                        <td>Audio pack tải xong → set active cache để SW ưu tiên pack thay cho runtime MP3 lẻ</td>
+                    </tr>
+                    <tr>
+                        <td><code>AUDIO_PACK_REMOVE_LANG</code></td>
+                        <td>AudioPackService</td>
+                        <td>Xóa audio pack → cleanup toàn bộ cache audio của ngôn ngữ đó</td>
+                    </tr>
+                    <tr>
+                        <td><code>MAP_PACK_ACTIVATE</code></td>
+                        <td>MapPackService</td>
+                        <td>Map pack install → activate cache mới để map runtime đọc pack vừa verify xong</td>
+                    </tr>
+                    <tr>
+                        <td><code>MAP_PACK_DEACTIVATE</code></td>
+                        <td>MapPackService</td>
+                        <td>Xóa map pack → cleanup PMTiles/style/font cache và trả app về lane cloud thuần</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight info">
+            <strong>Edge Case — Disk Full:</strong> Khi tải Pack mà hết dung lượng → <code>QuotaExceededError</code> →
+            Workbox tự xóa runtime cache (<code>audio-cache-lang-*</code>) + image cache (có
+            <code>purgeOnQuotaError: true</code>) để nhường chỗ cho Pack. "Hy sinh cái nhỏ, giữ cái lớn."
+        </div>
+        <div class="highlight success" style="margin-top:1rem;">
+            <strong>Remote update checks:</strong> nếu remote manifest lỗi liên tiếp, lane kiểm tra update sẽ tự vào
+            <code>cooldown</code> thay vì spam network. Điều này áp dụng cho cả Map Pack và Offline Bundle status.
+        </div>
+    </section>
+
+    <!-- MAPS -->
+    <section id="maps">
+        <div class="section-header">
+            <div class="icon" style="background:#e8f5e9;color:#1b5e20;">🗺️</div>
+            <div>
+                <div class="section-num">Chapter 10</div>
+                <h2>Map Pack — PMTiles Offline</h2>
+            </div>
+        </div>
+
+        <p style="margin-bottom:1.5rem;color:var(--text-secondary);">Map pack hiện đi theo mô hình static-first:
+            manifest và asset chính đi qua <code>/static/maps/*</code>, còn <code>/api/v1/maps/*</code> giữ vai trò
+            compatibility layer. Frontend có thể giữ nhiều pack theo <code>scope</code> (ví dụ Quận 4 / TP.HCM),
+            phát hiện update bằng cả version lẫn manifest fingerprint rồi mới activate qua <code>pmtiles://</code>.
+        </p>
+
+        <h3>Chuỗi Liên Kết 4 Tầng (End-to-End)</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tầng</th>
+                        <th>Thành phần chính</th>
+                        <th>Vai trò</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Mode Selection</td>
+                        <td><code>mapConfig.js</code> (Cloud / Offline / Hybrid)</td>
+                        <td>Chọn chiến lược render theo trạng thái mạng và pack đã kích hoạt.</td>
+                    </tr>
+                    <tr>
+                        <td>2. Pack Publication</td>
+                        <td>Static tree <code>/static/maps/*</code> + compatibility <code>/api/v1/maps/*</code></td>
+                        <td>Manifest công bố version, checksum, <code>scope</code>, <code>source_date</code>, <code>bbox</code> và absolute asset URLs.</td>
+                    </tr>
+                    <tr>
+                        <td>3. Pack Activation</td>
+                        <td>Frontend downloader + SHA-256 verify + safe/replace update</td>
+                        <td>Tải tài nguyên, xác thực toàn vẹn rồi mới activate; nếu pack khác scope đang chiếm chỗ thì có thể yêu cầu <code>replace_update</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>4. Runtime Rendering</td>
+                        <td>MapLibre + <code>pmtiles://</code></td>
+                        <td>Render từ local cache; hybrid vẫn giữ cloud fallback và probe dựa trên active cloud style thật.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>3 Chế Độ Bản Đồ</h3>
+        <div class="card-grid">
+            <div class="card">
+                <h3>☁️ Cloud (Default)</h3>
+                <p>Project-owned cloud style template, glyphs tự host và vẫn cần <code>VITE_MAPTILER_KEY</code> cho dữ liệu cloud.</p>
+            </div>
+            <div class="card">
+                <h3>📦 Offline Pack</h3>
+                <p>PMTiles + local style/glyphs tự host. Có thể active pack theo scope như Quận 4 hoặc TP.HCM, đọc từ
+                    Cache API sau khi verify và activate.</p>
+            </div>
+            <div class="card">
+                <h3>🔄 Hybrid Q4</h3>
+                <p>Cloud-first, tự fallback sang pack local khi probe cloud fail hoặc thiết bị offline; recovery về cloud
+                    có độ trễ để tránh flip-flop.</p>
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Backend Map Service</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Mô tả</th>
+                        <th>Cache</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>GET /static/maps/packs/current/manifest.json</code><br><code>GET /api/v1/maps/offline-manifest</code></td>
+                        <td>Manifest primary + compatibility manifest, luôn revalidate</td>
+                        <td>no-cache</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /api/v1/maps/offline-options</code></td>
+                        <td>Danh sách pack khả dụng theo scope/label/version/source_date/size</td>
+                        <td>no-cache</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /static/maps/packs/{version}/{file}.pmtiles</code></td>
+                        <td>PMTiles chính với Range Requests</td>
+                        <td>immutable</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /static/maps/styles/*.json</code></td>
+                        <td>Style JSON + sprite bundle self-host</td>
+                        <td>revalidate / immutable</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /static/maps/fonts/{fontstack}/{range}.pbf</code></td>
+                        <td>Glyph PBFs; compatibility API vẫn có tại <code>/api/v1/maps/*</code></td>
+                        <td>immutable</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight">
+            <strong>Security:</strong> <code>resolve_safe_path(base, relative)</code> → mọi đường dẫn phải
+            <code>resolve()</code> nằm trong base dir. Chặn hoàn toàn Path Traversal attack
+            (<code>../../etc/passwd</code>). Data dir: <code>backend/app/static/maps/</code> (override:
+            <code>MAP_PACK_DATA_DIR</code> env).
+        </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="admin">
+        <div class="section-header">
+            <div class="icon" style="background:#fff8e1;color:#f57f17;">👨‍💼</div>
+            <div>
+                <div class="section-num">Chapter 11</div>
+                <h2>Admin Dashboard + Owner Portal + AI Advisor</h2>
+            </div>
+        </div>
+
+        <p style="margin-bottom:1.5rem;color:var(--text-secondary);">Platform 3 cổng: Owner (B2B), Admin (vận hành), AI
+            Advisor (nâng cấp nội dung).</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>🏪 Owner Portal</h3>
+                <ul>
+                    <li>Đăng ký public: <code>POST /admin/auth/register-owner</code></li>
+                    <li>Admin duyệt → <code>is_verified=true</code> + <code>is_poi_owner_verified=true</code></li>
+                    <li>Quản lý POI: <code>PUT /owner/pois/{id}</code> (chỉ quán mình)</li>
+                    <li>Submissions → Admin phê duyệt mới lên app; review note dùng field chuẩn <code>admin_note</code></li>
+                    <li>Notification bell + detail page lấy từ <code>/owner/notifications*</code></li>
+                    <li>PII Encryption: CCCD mã hóa Fernet</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🎛️ Admin Dashboard (40 admin routes; +12 owner routes = 52 total)</h3>
+                <ul>
+                    <li>CRUD: POIs, Users, Roles, Menus</li>
+                    <li>Kiểm duyệt: Registrations, Submissions</li>
+                    <li>Auth: <code>/admin/auth/me</code>, <code>POST /admin/auth/change-password</code></li>
+                    <li>Giám sát: Analytics read models, Audit Logs, runtime observability window</li>
+                    <li>SSE: Audio Tasks progress real-time</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🤖 AI Advisor (Gemini 2.5 Flash / ProxyPal)</h3>
+                <ul>
+                    <li><code>GET /ai/usage</code> + <code>POST /ai/enhance-description</code></li>
+                    <li>Prompt: KHÔNG bịa, CÓ THỂ thêm tính từ tích cực, 200-300 từ</li>
+                    <li>Rate limit: Owner = 10/ngày (<code>OWNER_DAILY_LIMIT</code>, collection <code>ai_usage_limits</code>)</li>
+                    <li>Admin = unlimited</li>
+                    <li>Timeout: 30s, fallback provider rõ ràng cho UI</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Owner Registration Flow</h3>
+        <div class="flow">
+            <span class="flow-step">Chủ quán đăng ký</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step alt">Tạo user (poi_owner, unverified)</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step warning">Tạo poi_owner_registrations (pending)</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step success">Admin duyệt → user verified + owner verified</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">Owner login → /owner</span>
+        </div>
+        <div class="highlight info" style="margin-top:1rem;">
+            <strong>Owner UX mới:</strong> sau review, owner nhận notification trong app; trang dashboard, submissions,
+            notifications và POI pages đều chỉ fetch khi tài khoản đã qua gate <code>is_poi_owner_verified</code>.
+        </div>
+        <div class="highlight success" style="margin-top:1rem;">
+            <strong>Analytics semantics:</strong> public analytics chỉ bắt đầu sau khi user grant consent.
+            <code>tracked_online_users</code> là số anonymous device đã consent còn trong sliding window hiện tại, không
+            phải tổng traffic hay số tab đang mở.
+        </div>
+    </section>
+
+    <!-- DESIGN PATTERNS -->
+    <section id="patterns">
+        <div class="section-header">
+            <div class="icon" style="background:#ede7f6;color:#4527a0;">⚡</div>
+            <div>
+                <div class="section-num">Summary</div>
+                <h2>Design Patterns & Key Constants</h2>
+            </div>
+        </div>
+
+        <h3>Architecture Patterns</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Mô tả</th>
+                        <th>Industry Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Modular Monolith</strong></td>
+                        <td>9 domain backend chính + 10 mounted routers, chia boundary bằng router/service/store nhưng dùng chung runtime</td>
+                        <td>Shopify modular monolith approach</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4-Tier Hybrid Audio</strong></td>
+                        <td>Pre-gen → On-demand → Cloud TTS → Local TTS</td>
+                        <td>Netflix adaptive streaming philosophy</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3-Tier Content Fallback</strong></td>
+                        <td>Target → English → Vietnamese</td>
+                        <td>ICU locale fallback chain (Unicode CLDR)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dual-Lane Internationalization</strong></td>
+                        <td>POI content locale và UI bundle warm riêng; switch chỉ complete khi cả hai đều ready</td>
+                        <td>Mobile staged i18n rollout patterns</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Language Sharding</strong></td>
+                        <td>SW cache per language + LRU eviction + active-language pin</td>
+                        <td>CDN edge cache partitioning</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Geofence Reconciliation</strong></td>
+                        <td>Safety reconcile 5s, debounce 3s, cooldown 5min</td>
+                        <td>iOS CLLocationManager patterns</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dynamic RBAC</strong></td>
+                        <td>Static permissions (code) + Dynamic roles (DB)</td>
+                        <td>AWS IAM policy model</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consent-Gated Analytics</strong></td>
+                        <td>Chỉ ingest khi user grant consent; runtime observability là lane riêng không trộn vào analytics</td>
+                        <td>Privacy-by-design analytics pipeline</td>
+                    </tr>
+                    <tr>
+                        <td><strong>httpOnly Cookie Auth</strong></td>
+                        <td>XSS-safe + SameSite=Lax CSRF protection</td>
+                        <td>OWASP Session Management guidelines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Offline-First PWA</strong></td>
+                        <td>SW + IndexedDB + Cache API + PMTiles</td>
+                        <td>Google Workbox best practices</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SSE Progress Tracking</strong></td>
+                        <td>AudioTaskManager snapshot Mongo + EventSource → UI</td>
+                        <td>GitHub Actions live log streaming</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PII Encryption at Rest</strong></td>
+                        <td>Fernet + 180-day auto-redaction</td>
+                        <td>GDPR data minimization principle</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Key Constants</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Constant</th>
+                        <th>Value</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ACCESS_TOKEN_EXPIRE</td>
+                        <td>30 phút</td>
+                        <td>Backend config</td>
+                    </tr>
+                    <tr>
+                        <td>REFRESH_TOKEN_EXPIRE</td>
+                        <td>7 ngày</td>
+                        <td>Backend config</td>
+                    </tr>
+                    <tr>
+                        <td>VOICE_CATALOG_TTL</td>
+                        <td>6 giờ</td>
+                        <td>audio/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>MAX_CONCURRENT_TTS</td>
+                        <td>3 (Semaphore)</td>
+                        <td>audio/task_manager.py</td>
+                    </tr>
+                    <tr>
+                        <td>AUDIO_TASK_HEARTBEAT</td>
+                        <td>5 giây</td>
+                        <td>audio/task_manager.py</td>
+                    </tr>
+                    <tr>
+                        <td>AUDIO_TASK_STALE_AFTER</td>
+                        <td>5 phút</td>
+                        <td>audio/task_store.py</td>
+                    </tr>
+                    <tr>
+                        <td>AUDIO_TASK_RETENTION</td>
+                        <td>14 ngày</td>
+                        <td>audio/task_store.py</td>
+                    </tr>
+                    <tr>
+                        <td>PII_RETENTION_DAYS</td>
+                        <td>180 ngày</td>
+                        <td>admin/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>MAX_POI_IMAGES</td>
+                        <td>8</td>
+                        <td>content/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>MAX_IMAGE_SIZE</td>
+                        <td>5 MB</td>
+                        <td>content/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>ON_DEMAND_RATE_LIMIT</td>
+                        <td>30 req / 10 phút</td>
+                        <td>localization/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>HOTSET_MAX_POI_IDS</td>
+                        <td>10</td>
+                        <td>localization/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>HOTSET_REQUIRED_CACHE_COUNT</td>
+                        <td>3</td>
+                        <td>LanguageHotsetService.js</td>
+                    </tr>
+                    <tr>
+                        <td>OWNER_DAILY_LIMIT</td>
+                        <td>10</td>
+                        <td>ai_advisor/service.py</td>
+                    </tr>
+                    <tr>
+                        <td>STARTUP_PROBE_WINDOW</td>
+                        <td>8 giây</td>
+                        <td>startupNetworkProbe.js</td>
+                    </tr>
+                    <tr>
+                        <td>STARTUP_PROBE_MAX_FAILS</td>
+                        <td>2</td>
+                        <td>startupNetworkProbe.js</td>
+                    </tr>
+                    <tr>
+                        <td>GPS Throttle</td>
+                        <td>5s</td>
+                        <td>LocationService.js</td>
+                    </tr>
+                    <tr>
+                        <td>Locate Request Budget</td>
+                        <td>15 giây</td>
+                        <td>LocationService.js</td>
+                    </tr>
+                    <tr>
+                        <td>Locate Max Cached Age</td>
+                        <td>30 giây</td>
+                        <td>LocationService.js</td>
+                    </tr>
+                    <tr>
+                        <td>Geofence Debounce</td>
+                        <td>3s</td>
+                        <td>GeofenceEngine.js</td>
+                    </tr>
+                    <tr>
+                        <td>Geofence Default Radius</td>
+                        <td>30m</td>
+                        <td>GeofenceEngine.js</td>
+                    </tr>
+                    <tr>
+                        <td>Geofence Cooldown</td>
+                        <td>5 phút</td>
+                        <td>GeofenceEngine.js</td>
+                    </tr>
+                    <tr>
+                        <td>Safety Reconcile Interval</td>
+                        <td>5s</td>
+                        <td>GeofenceEngine.js</td>
+                    </tr>
+                    <tr>
+                        <td>Prefetch Queue Limit</td>
+                        <td>Top 3 / batch, gate ≥ 30s</td>
+                        <td>useGeofence.js</td>
+                    </tr>
+                    <tr>
+                        <td>Hotset Nearby Radius</td>
+                        <td>1500m</td>
+                        <td>LanguageHotsetService.js</td>
+                    </tr>
+                    <tr>
+                        <td>POI Cache TTL</td>
+                        <td>15 phút</td>
+                        <td>poiStore.js / sw.js</td>
+                    </tr>
+                    <tr>
+                        <td>Audio Max Per Lang</td>
+                        <td>300 entries</td>
+                        <td>sw.js</td>
+                    </tr>
+                    <tr>
+                        <td>Max Language Caches</td>
+                        <td>3</td>
+                        <td>sw.js</td>
+                    </tr>
+                    <tr>
+                        <td>IndexedDB</td>
+                        <td>Quan4DB v2</td>
+                        <td>db.js</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FULL FLOW -->
+    <section id="full-flow">
+        <div class="section-header">
+            <div class="icon" style="background:#e0f2f1;color:#00695c;">🔄</div>
+            <div>
+                <div class="section-num">Chapter 12</div>
+                <h2>End-to-End Flow — Từ Mở App đến Nghe Audio</h2>
+            </div>
+        </div>
+
+        <div class="mermaid-container">
+            <pre class="mermaid">
+sequenceDiagram
+    participant U as User/Browser
+    participant SW as Service Worker
+    participant FE as React Frontend
+    participant GE as GeofenceEngine
+    participant NE as NarrationEngine
+    participant BE as FastAPI Backend
+    participant DB as MongoDB
+
+    U->>SW: Mở app → SW register
+    FE->>FE: React Router → MapApp → SplashScreen
+    FE->>U: Chọn ngôn ngữ
+    par Parallel Load
+        FE->>SW: getOfflinePOIs() (IDB)
+        FE->>BE: GET /poi/load-all?lang=en
+        BE->>DB: Query POIs + Localizations
+        BE-->>FE: POI data (3-Tier Fallback)
+        FE->>BE: POST /localizations/prepare-hotset
+        FE->>BE: POST /localizations/warmup
+    end
+    FE->>FE: SplashScreen ẩn → Map render
+    FE->>GE: startTracking (watchPosition)
+
+    loop Every 5s (GPS Throttle)
+        U->>GE: GPS position update
+        GE->>GE: checkGeofences (turf.distance)
+        GE->>GE: pendingEntries → debounce 3s → confirm ENTER
+        GE->>GE: _processAudioDecision (priority sort)
+        GE->>NE: queueNarration(bestPOI)
+    end
+
+    NE->>NE: playWithFallback()
+    alt Tier 1: Pre-gen audio
+        NE->>SW: fetch audio_url
+        SW-->>NE: CacheFirst → MP3
+    else Tier 1.5: On-demand
+        NE->>BE: POST /localizations/on-demand
+        BE->>DB: translate + TTS → save
+        BE-->>NE: new audio_url
+    else Tier 2: Cloud TTS
+        NE->>BE: POST /audio/tts
+        BE-->>NE: Stream MP3
+    else Tier 3: Local TTS
+        NE->>U: window.speechSynthesis
+    end
+    NE-->>FE: onFinished → close popup
+    </pre>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section>
+        <div class="section-header">
+            <div class="icon" style="background:#fce4ec;color:#b71c1c;">🛠️</div>
+            <div>
+                <div class="section-num">Appendix</div>
+                <h2>Technology Stack & Cost Analysis</h2>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>Backend</h3>
+                <ul>
+                    <li><strong>FastAPI</strong> — async Python web framework</li>
+                    <li><strong>Motor</strong> — async MongoDB driver</li>
+                    <li><strong>Edge-TTS</strong> — Microsoft Neural Voices (FREE)</li>
+                    <li><strong>deep-translator</strong> — Google Translate wrapper (FREE)</li>
+                    <li><strong>Google Gemini 2.5 Flash / ProxyPal gateway</strong> — AI enhancement</li>
+                    <li><strong>bcrypt</strong> — password hashing</li>
+                    <li><strong>PyJWT</strong> — JWT tokens (HS256)</li>
+                    <li><strong>cryptography (Fernet)</strong> — PII encryption</li>
+                    <li><strong>Redis</strong> — presence, analytics rate limit, coordination keys</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Frontend</h3>
+                <ul>
+                    <li><strong>React 19.2+</strong> — UI framework</li>
+                    <li><strong>Vite 7.x</strong> — build tool (PWA plugin)</li>
+                    <li><strong>Zustand</strong> — state management</li>
+                    <li><strong>MapLibre GL JS</strong> — vector maps</li>
+                    <li><strong>Turf.js</strong> — geospatial calculations</li>
+                    <li><strong>Workbox</strong> — Service Worker toolkit</li>
+                    <li><strong>idb</strong> — IndexedDB wrapper</li>
+                    <li><strong>PMTiles</strong> — offline vector tiles</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Open-Source Core + Optional APIs</h3>
+                <ul>
+                    <li>✅ Edge-TTS: 300+ neural voices, miễn phí</li>
+                    <li>✅ deep-translator: Google Translate free tier</li>
+                    <li>✅ PMTiles: self-hosted, no tile server needed</li>
+                    <li>✅ MapLibre: open-source, free forever</li>
+                    <li>✅ Workbox: Google open-source SW toolkit</li>
+                    <li>⚠️ Gemini / ProxyPal: API key needed, quota 10 uses/day cho owner</li>
+                    <li>⚠️ MapTiler: API key chỉ cần cho cloud/hybrid mode</li>
+                    <li>⚠️ OpenWeather: chỉ dùng khi bật weather context cho AI</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>Hệ Thống Du Lịch Ẩm Thực Quận 4</strong></p>
+        <p>Full-stack PWA — FastAPI + React + MapLibre + Edge-TTS + Gemini AI</p>
+        <p style="margin-top:.5rem;">Generated from codebase analysis • All data verified against source code</p>
+    </footer>
+
+    <!-- Diagram Modal Overlay -->
+    <div id="dgOverlay" class="diagram-overlay">
+        <div class="diagram-modal">
+            <div class="dm-header">
+                <h3 id="dgTitle">Sơ đồ</h3>
+                <div class="dm-ctrl">
+                    <button id="zoomOut" title="Thu nhỏ">−</button>
+                    <span class="zpct" id="zpct">100%</span>
+                    <button id="zoomIn" title="Phóng to">+</button>
+                    <button id="zoomReset" title="Vừa màn hình">⟲</button>
+                    <button id="dgClose" title="Đóng (ESC)" style="margin-left:.5rem;font-size:1.2rem">✕</button>
+                </div>
+            </div>
+            <div class="dm-body" id="dgBody">
+                <div class="vp" id="dgVp"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagram data (section mapping + mermaid definitions) -->
+
+    <!-- Modular Architecture Scripts -->
+    <script src="js/diagrams-data.js"></script>
+    <script src="js/mermaid.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
