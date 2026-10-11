@@ -1,0 +1,231 @@
+/* =========================================================
+   APP CONTAINER & MOBILE SIMULATOR STYLES
+   ========================================================= */
+
+.app-root-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 16px 8px;
+  position: relative;
+}
+
+/* Desktop Top Toolbar */
+.desktop-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 440px;
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  background: rgba(23, 27, 33, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+.desktop-toolbar.wide {
+  max-width: 600px;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-badge {
+  background: #10b981;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.toolbar-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill);
+  color: #e2e8f0;
+  font-size: 12px;
+  padding: 5px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.toolbar-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Mobile Frame (Desktop Mockup) */
+.mobile-device-frame {
+  width: 100%;
+  max-width: 400px;
+  height: 820px;
+  max-height: calc(100dvh - 80px);
+  background: #000000;
+  border-radius: 44px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 10px #1f242e, 0 0 0 12px #2d3443;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fullscreen mode (fills width nicely for web testing) */
+.mobile-device-frame.mode-full {
+  max-width: 600px;
+  height: calc(100dvh - 70px);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.mobile-device-frame.mode-full .mobile-status-bar,
+.mobile-device-frame.mode-full .home-indicator {
+  display: none;
+}
+
+/* Mobile Status Bar Simulation */
+.mobile-status-bar {
+  height: 44px;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  border-bottom: 1px solid transparent;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 22px;
+  background: #000000;
+  border-radius: 20px;
+}
+
+.status-left {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+/* Screen Content Area */
+.mobile-screen-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Home Indicator Bar */
+.home-indicator {
+  height: 18px;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-indicator-bar {
+  width: 120px;
+  height: 4px;
+  background: var(--color-text-muted);
+  opacity: 0.6;
+  border-radius: 999px;
+}
+
+/* Mobile Network Info Modal */
+.network-info-banner {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 11px;
+  text-align: center;
+  max-width: 400px;
+}
+
+.network-info-banner strong {
+  color: #38bdf8;
+}
+
+/* On Real Mobile Devices or Small Screens (< 500px) */
+@media (max-width: 500px) {
+  .app-root-container {
+    padding: 0;
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+
+  .desktop-toolbar {
+    display: none;
+  }
+
+  .mobile-device-frame {
+    max-width: 100%;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  .mobile-status-bar,
+  .home-indicator,
+  .network-info-banner {
+    display: none;
+  }
+}
