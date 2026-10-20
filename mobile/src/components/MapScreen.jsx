@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import MapLibreView from "./MapLibreView";
 import { loadPois } from "../services/poiApi";
+import { getActiveSession, logoutSession } from "../services/ticketService";
+import QrLoginModal from "./QrLoginModal";
 import "./map.css";
 
 
@@ -30,6 +32,16 @@ export default function MapScreen() {
     try { return JSON.parse(localStorage.getItem('quan4:saved-pois') || '[]'); } catch { return []; }
   });
   const [userLocation, setUserLocation] = useState(null);
+
+  // QR Ticket Session State
+  const [session, setSession] = useState(getActiveSession());
+  const [showQrModal, setShowQrModal] = useState(false);
+
+  useEffect(() => {
+    const handleSessionUpdate = () => setSession(getActiveSession());
+    window.addEventListener('quan4:session-updated', handleSessionUpdate);
+    return () => window.removeEventListener('quan4:session-updated', handleSessionUpdate);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -110,6 +122,51 @@ export default function MapScreen() {
         </div>
 
         <div className="mobile-app-actions">
+          {session ? (
+            <button
+              className="ticket-status-btn active"
+              onClick={() => {
+                if (window.confirm(`Bạn đang đăng nhập vé: "${session.note}".\nThiết bị: ${session.device_name || session.device_id}\n\nBạn có muốn đăng xuất vé này không?`)) {
+                  logoutSession();
+                }
+              }}
+              title="Bấm để xem thông tin vé hoặc đăng xuất"
+              style={{
+                background: 'rgba(16, 185, 129, 0.2)',
+                color: '#34d399',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                padding: '6px 10px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+              }}
+            >
+              🎟️ Đã kích hoạt
+            </button>
+          ) : (
+            <button
+              className="ticket-status-btn scan"
+              onClick={() => setShowQrModal(true)}
+              title="Quét mã QR do Admin cấp để kích hoạt vé 24h"
+              style={{
+                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                color: '#ffffff',
+                border: 'none',
+                padding: '6px 10px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              📷 Quét QR
+            </button>
+          )}
+
           <button
             className="icon-btn"
             title="Định vị của tôi"
@@ -120,6 +177,43 @@ export default function MapScreen() {
           </button>
         </div>
       </header>
+
+      {/* --- Ticket Prompt Banner --- */}
+      {!session ? (
+        <div
+          onClick={() => setShowQrModal(true)}
+          style={{
+            background: 'linear-gradient(90deg, #1e293b, #0f172a)',
+            borderBottom: '1px solid rgba(245, 158, 11, 0.3)',
+            padding: '8px 14px',
+            fontSize: '11.5px',
+            color: '#fbbf24',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+          }}
+        >
+          <span>🎟️ Chế độ Khách: Quét QR vé 24h để mở khóa Thuyết minh GPS!</span>
+          <span style={{ fontWeight: '700' }}>Quét ➔</span>
+        </div>
+      ) : (
+        <div
+          style={{
+            background: 'rgba(16, 185, 129, 0.1)',
+            borderBottom: '1px solid rgba(16, 185, 129, 0.2)',
+            padding: '6px 14px',
+            fontSize: '11.5px',
+            color: '#34d399',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span>✅ Đã kích hoạt: <strong>{session.note}</strong></span>
+          <span style={{ fontSize: '10.5px', color: '#94a3b8' }}>1 thiết bị</span>
+        </div>
+      )}
 
       {/* --- Quick Search Bar --- */}
       <div className="map-search-container">
@@ -456,6 +550,13 @@ export default function MapScreen() {
           {savedList.length > 0 && <span className="tab-badge">{savedList.length}</span>}
         </button>
       </nav>
+
+      {/* --- QR Login Modal --- */}
+      <QrLoginModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        onSuccess={(newSession) => setSession(newSession)}
+      />
     </div>
   );
 }

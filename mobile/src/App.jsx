@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import MapScreen from './components/MapScreen';
+import AdminPortal from './components/AdminPortal';
+import { loginWithQr, getCurrentDevice } from './services/ticketService';
 import './App.css';
 
 function App() {
-  const [viewMode, setViewMode] = useState('mockup'); // 'mockup' | 'full'
+  const [viewMode, setViewMode] = useState('mockup'); // 'mockup' | 'full' | 'admin'
   const [theme, setTheme] = useState('dark');
   const [currentTime, setCurrentTime] = useState('');
 
@@ -24,15 +26,31 @@ function App() {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  const handleAdminLoginMobile = (ticket) => {
+    try {
+      const dev = getCurrentDevice();
+      loginWithQr({
+        qrToken: ticket.qr_token,
+        deviceId: dev.id,
+        deviceName: dev.name,
+      });
+      setViewMode('mockup');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="app-root-container" data-theme={theme}>
-      {/* --- Desktop Toolbar (Ẩn trên điện thoại thật) --- */}
-      <header className={`desktop-toolbar ${viewMode === 'full' ? 'wide' : ''}`}>
+      {/* --- Desktop Toolbar --- */}
+      <header className={`desktop-toolbar ${viewMode === 'full' || viewMode === 'admin' ? 'wide' : ''}`}>
         <div className="toolbar-left">
           <span className="toolbar-title">
-            📱 Giao diện Mobile
+            {viewMode === 'admin' ? '👑 Bảng Quản Trị Hệ Thống' : '📱 Giao diện Du Khách'}
           </span>
-          <span className="toolbar-badge">Active</span>
+          <span className="toolbar-badge">
+            {viewMode === 'admin' ? 'Admin Portal' : 'Active'}
+          </span>
         </div>
 
         <div className="toolbar-right">
@@ -51,6 +69,14 @@ function App() {
             🖥️ Mở rộng
           </button>
           <button
+            className={`toolbar-btn ${viewMode === 'admin' ? 'active' : ''}`}
+            onClick={() => setViewMode('admin')}
+            title="Mở Bảng Quản Trị: Cấp vé QR 24h, Device Binding & Điểm ẩm thực"
+            style={viewMode === 'admin' ? { background: '#f59e0b', color: '#0f172a', fontWeight: '700' } : {}}
+          >
+            👑 Quản trị (Admin)
+          </button>
+          <button
             className="toolbar-btn"
             onClick={toggleTheme}
             title="Đổi nền Sáng / Tối"
@@ -60,41 +86,50 @@ function App() {
         </div>
       </header>
 
-      {/* --- Mobile Phone Wrapper --- */}
-      <main
-        className={`mobile-device-frame ${viewMode === 'full' ? 'mode-full' : ''}`}
-        data-theme={theme}
-      >
-        {/* Status Bar (iPhone Simulation) */}
-        {viewMode === 'mockup' && (
-          <div className="mobile-status-bar">
-            <span className="status-left">{currentTime || '09:41'}</span>
-            <div className="dynamic-island" />
-            <div className="status-right">
-              <span>5G</span>
-              <span>📶</span>
-              <span>🔋</span>
+      {/* --- Body Router: Admin Portal or Mobile View --- */}
+      {viewMode === 'admin' ? (
+        <AdminPortal
+          onSwitchToMobile={() => setViewMode('mockup')}
+          onLoginWithTicket={handleAdminLoginMobile}
+        />
+      ) : (
+        <main
+          className={`mobile-device-frame ${viewMode === 'full' ? 'mode-full' : ''}`}
+          data-theme={theme}
+        >
+          {/* Status Bar (iPhone Simulation) */}
+          {viewMode === 'mockup' && (
+            <div className="mobile-status-bar">
+              <span className="status-left">{currentTime || '09:41'}</span>
+              <div className="dynamic-island" />
+              <div className="status-right">
+                <span>5G</span>
+                <span>📶</span>
+                <span>🔋</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Screen Content: Quận 4 App MapScreen */}
-        <div className="mobile-screen-content">
-          <MapScreen />
-        </div>
-
-        {/* Home Indicator Bar */}
-        {viewMode === 'mockup' && (
-          <div className="home-indicator">
-            <div className="home-indicator-bar" />
+          {/* Screen Content: Quận 4 App MapScreen */}
+          <div className="mobile-screen-content">
+            <MapScreen />
           </div>
-        )}
-      </main>
+
+          {/* Home Indicator Bar */}
+          {viewMode === 'mockup' && (
+            <div className="home-indicator">
+              <div className="home-indicator-bar" />
+            </div>
+          )}
+        </main>
+      )}
 
       {/* --- Quick Network Access Hint --- */}
-      <footer className="network-info-banner">
-        💡 Mẹo: Ứng dụng hỗ trợ cảm ứng mượt mà. Bạn có thể mở <strong>F12 → Toggle device toolbar</strong> (Ctrl+Shift+M) hoặc truy cập qua mạng WiFi nội bộ để trải nghiệm trực tiếp trên điện thoại!
-      </footer>
+      {viewMode !== 'admin' && (
+        <footer className="network-info-banner">
+          💡 Mẹo: Bạn có thể bấm nút <strong>👑 Quản trị (Admin)</strong> trên thanh công cụ để tạo mã QR 24h và kiểm tra cơ chế bảo mật khóa 1 thiết bị!
+        </footer>
+      )}
     </div>
   );
 }
