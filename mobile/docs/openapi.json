@@ -120,11 +120,107 @@
     }
   },
   "paths": {
+    "/auth/admin/generate-qr": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Admin tạo mã QR đăng nhập 24h (Chỉ 1 thiết bị)",
+        "description": "Admin tạo mã QR ngẫu nhiên (độ dài 32 ký tự Base62 / 190-bit entropy), tự động hết hạn sau 24h và giới hạn chỉ duy nhất 1 thiết bị kích hoạt.",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "valid_hours": { "type": "integer", "default": 24, "example": 24 },
+                  "max_devices": { "type": "integer", "default": 1, "example": 1 },
+                  "note": { "type": "string", "example": "Khách tour ẩm thực Quận 4 - Vé #1024" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo mã QR thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "qr_token": { "type": "string", "example": "qr_sec_8f9a2c3d4e5f6a7b8c9d0e1f2a3b4c5d" },
+                    "qr_payload": { "type": "string", "example": "gps-app://login?token=qr_sec_8f9a2c3d4e5f6a7b8c9d0e1f2a3b4c5d" },
+                    "token_length": { "type": "integer", "example": 32 },
+                    "created_at": { "type": "string", "example": "2026-10-20T14:30:00Z" },
+                    "expires_at": { "type": "string", "example": "2026-10-21T14:30:00Z" },
+                    "max_devices": { "type": "integer", "example": 1 },
+                    "status": { "type": "string", "example": "pending_activation" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/qr-login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Quét mã QR để đăng nhập (Khóa chặt vào 1 thiết bị duy nhất)",
+        "description": "Du khách quét mã QR để đăng nhập không cần mật khẩu. Thiết bị đầu tiên quét mã sẽ được lưu (bind). Nếu thiết bị thứ 2 cố quét mã này sẽ bị từ chối 409 Conflict. Mã tự động vô hiệu sau 24 giờ.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["qr_token", "device_id"],
+                "properties": {
+                  "qr_token": { "type": "string", "example": "qr_sec_8f9a2c3d4e5f6a7b8c9d0e1f2a3b4c5d" },
+                  "device_id": { "type": "string", "example": "dev-iphone15-a89c7d12-34ef" },
+                  "device_name": { "type": "string", "example": "iPhone 15 Pro Max" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công và đã bind thiết bị",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "access_token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+                    "token_type": { "type": "string", "example": "Bearer" },
+                    "expires_in_seconds": { "type": "integer", "example": 86400 },
+                    "expires_at": { "type": "string", "example": "2026-10-21T14:30:00Z" },
+                    "bound_device_id": { "type": "string", "example": "dev-iphone15-a89c7d12-34ef" }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Mã QR đã hết hạn 24 giờ",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "409": {
+            "description": "Mã QR đã bị thiết bị khác sử dụng (Chỉ cho phép đúng 1 thiết bị)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "tags": ["Authentication"],
-        "summary": "Đăng nhập người dùng",
-        "description": "Xác thực tài khoản và trả về JWT Token cho phiên làm việc",
+        "summary": "Đăng nhập người dùng (Username/Password)",
+        "description": "Dành cho Admin hoặc hướng dẫn viên quản lý hệ thống",
         "requestBody": {
           "required": true,
           "content": {

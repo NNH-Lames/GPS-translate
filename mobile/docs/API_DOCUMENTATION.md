@@ -28,36 +28,52 @@ Hệ thống API phục vụ ứng dụng **Bản đồ ẩm thực & Thuyết m
 
 | STT | Phương thức | Đường dẫn API | Mô tả chức năng | Quyền truy cập |
 | :---: | :---: | :--- | :--- | :---: |
-| **I** | **Authentication** | | | |
-| 1 | `POST` | `/auth/login` | Đăng nhập tài khoản, nhận JWT token | Public |
-| 2 | `GET` | `/auth/me` | Lấy thông tin tài khoản đang đăng nhập | Bearer Token |
+| **I** | **Xác thực & Quét QR (Authentication)** | | | |
+| 1 | `POST` | `/auth/admin/generate-qr` | Admin sinh mã QR 24h (32 ký tự, khóa 1 thiết bị) | Admin / Token |
+| 2 | `POST` | `/auth/qr-login` | Khách quét QR đăng nhập (Tự động bind duy nhất 1 thiết bị) | Public |
+| 3 | `POST` | `/auth/login` | Đăng nhập tài khoản Admin/HDV bằng mật khẩu | Public |
+| 4 | `GET` | `/auth/me` | Lấy thông tin tài khoản đang đăng nhập | Bearer Token |
 | **II** | **POI & Bản đồ ẩm thực** | | | |
-| 3 | `GET` | `/poi/load-all` | Tải toàn bộ danh sách POI (gọi trực tiếp từ Mobile app) | Public |
-| 4 | `GET` | `/poi/{id}` | Lấy chi tiết thông tin một địa điểm ẩm thực | Public |
-| 5 | `GET` | `/poi/nearby` | Tìm các địa điểm gần tọa độ GPS người dùng | Public |
-| 6 | `POST` | `/poi` | Thêm mới địa điểm ẩm thực | Admin / Token |
-| 7 | `PUT` | `/poi/{id}` | Cập nhật thông tin địa điểm ẩm thực | Admin / Token |
-| 8 | `DELETE` | `/poi/{id}` | Xóa địa điểm | Admin / Token |
+| 5 | `GET` | `/poi/load-all` | Tải toàn bộ danh sách POI (gọi trực tiếp từ Mobile app) | Public |
+| 6 | `GET` | `/poi/{id}` | Lấy chi tiết thông tin một địa điểm ẩm thực | Public |
+| 7 | `GET` | `/poi/nearby` | Tìm các địa điểm gần tọa độ GPS người dùng | Public |
+| 8 | `POST` | `/poi` | Thêm mới địa điểm ẩm thực | Admin / Token |
+| 9 | `PUT` | `/poi/{id}` | Cập nhật thông tin địa điểm ẩm thực | Admin / Token |
+| 10 | `DELETE` | `/poi/{id}` | Xóa địa điểm | Admin / Token |
 | **III**| **GPS & Geofence (Thuyết minh tự động)** | | | |
-| 9 | `POST` | `/gps/geofence-check` | Kiểm tra tọa độ GPS để tự kích hoạt phát âm thanh | Public |
+| 11 | `POST` | `/gps/geofence-check` | Kiểm tra tọa độ GPS để tự kích hoạt phát âm thanh | Public |
 | **IV** | **Dịch thuật đa ngôn ngữ** | | | |
-| 10 | `GET` | `/translate/languages` | Danh sách ngôn ngữ hệ thống hỗ trợ (VI, EN, ZH, JA...) | Public |
-| 11 | `POST` | `/translate/text` | Dịch nội dung mô tả / biển hiệu / thực đơn món | Public |
+| 12 | `GET` | `/translate/languages` | Danh sách ngôn ngữ hệ thống hỗ trợ (VI, EN, ZH, JA...) | Public |
+| 13 | `POST` | `/translate/text` | Dịch nội dung mô tả / biển hiệu / thực đơn món | Public |
 | **V** | **Audio Guide & Giọng nói (TTS)** | | | |
-| 12 | `GET` | `/audio/poi/{id}` | Stream file âm thanh thuyết minh theo POI & ngôn ngữ | Public |
-| 13 | `POST` | `/audio/tts` | Tạo âm thanh thuyết minh từ văn bản (Text-To-Speech) | Public / Token |
+| 14 | `GET` | `/audio/poi/{id}` | Stream file âm thanh thuyết minh theo POI & ngôn ngữ | Public |
+| 15 | `POST` | `/audio/tts` | Tạo âm thanh thuyết minh từ văn bản (Text-To-Speech) | Public / Token |
 | **VI** | **Đánh giá & Yêu thích** | | | |
-| 14 | `GET` | `/poi/{id}/reviews` | Lấy danh sách đánh giá của quán | Public |
-| 15 | `POST` | `/poi/{id}/reviews` | Gửi bình luận và số sao đánh giá (1 - 5) | Bearer Token |
-| 16 | `GET` | `/user/saved-pois` | Lấy danh sách các quán đã bấm lưu yêu thích | Bearer Token |
-| 17 | `POST` | `/user/saved-pois` | Thêm quán vào danh sách đã lưu | Bearer Token |
-| 18 | `DELETE` | `/user/saved-pois/{id}` | Xóa quán khỏi danh sách đã lưu | Bearer Token |
+| 16 | `GET` | `/poi/{id}/reviews` | Lấy danh sách đánh giá của quán | Public |
+| 17 | `POST` | `/poi/{id}/reviews` | Gửi bình luận và số sao đánh giá (1 - 5) | Bearer Token |
+| 18 | `GET` | `/user/saved-pois` | Lấy danh sách các quán đã bấm lưu yêu thích | Bearer Token |
+| 19 | `POST` | `/user/saved-pois` | Thêm quán vào danh sách đã lưu | Bearer Token |
+| 20 | `DELETE` | `/user/saved-pois/{id}` | Xóa quán khỏi danh sách đã lưu | Bearer Token |
 
 ---
 
 ## 🔍 Chi Tiết Các Endpoint Nổi Bật
 
-### 1. Tải toàn bộ POI lên bản đồ (`/poi/load-all`)
+### 1. Cơ chế Quét QR Đăng Nhập (Tự hủy sau 24h & Khóa chặt 1 thiết bị)
+- **Bài toán bảo mật:** Du khách không cần tạo tài khoản. Admin cấp mã QR có hạn dùng đúng 24h. Mã QR chứa chuỗi ID bảo mật 32 ký tự Base62 (~190 bit entropy, chống dò mã tuyệt đối).
+- **Quy trình hoạt động:**
+  1. **Admin tạo QR:** `POST /api/v1/auth/admin/generate-qr`
+     - Request: `{ "valid_hours": 24, "max_devices": 1, "note": "Vé tour #1024" }`
+     - Response: Trả về `qr_token` và `qr_payload`.
+  2. **Du khách quét QR:** Ứng dụng điện thoại lấy `device_id` và gửi `POST /api/v1/auth/qr-login`:
+     - Request: `{ "qr_token": "qr_sec_...", "device_id": "dev-iphone15-a89c7d12", "device_name": "iPhone 15" }`
+     - **Lần đầu quét:** Server gán `bound_device_id = request.device_id` và trả về Bearer Token phiên làm việc.
+     - **Nếu có người khác (thiết bị thứ 2) quét lại mã này:** Server kiểm tra `bound_device_id !== request.device_id` và trả về ngay lỗi `409 Conflict (DEVICE_ALREADY_BOUND)`.
+     - **Sau 24 giờ kể từ lúc tạo:** Server trả về lỗi `403 Forbidden (QR_EXPIRED)`.
+
+---
+
+### 2. Tải toàn bộ POI lên bản đồ (`/poi/load-all`)
 - **Khớp trực tiếp với file:** [`mobile/src/services/poiApi.js`](file:///d:/2026/T9/CNPT/GPS-translate/mobile/src/services/poiApi.js)
 - **Tham số Query:**
   - `lang`: Ngôn ngữ (ví dụ: `vi`, `en`)

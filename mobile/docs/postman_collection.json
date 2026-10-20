@@ -22,7 +22,82 @@
       "name": "1. Authentication",
       "item": [
         {
-          "name": "Đăng nhập tài khoản",
+          "name": "Admin tạo mã QR 24h (Chỉ 1 thiết bị)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valid_hours\": 24,\n  \"max_devices\": 1,\n  \"note\": \"Khách tour ẩm thực Quận 4 - Vé #1024\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/admin/generate-qr",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "admin", "generate-qr"]
+            },
+            "description": "Admin tạo mã QR với độ dài ID 32 ký tự Base62 (~190 bit entropy), tự hết hạn sau 24h và giới hạn đúng 1 thiết bị."
+          },
+          "response": [
+            {
+              "name": "Tạo QR thành công",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"qr_token\": \"qr_sec_8f9a2c3d4e5f6a7b8c9d0e1f2a3b4c5d\",\n  \"qr_payload\": \"gps-app://login?token=qr_sec_8f9a2c3d4e5f6a7b8c9d0e1f2a3b4c5d\",\n  \"token_length\": 32,\n  \"created_at\": \"2026-10-20T14:30:00Z\",\n  \"expires_at\": \"2026-10-21T14:30:00Z\",\n  \"max_devices\": 1,\n  \"status\": \"pending_activation\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Khách quét mã QR để đăng nhập (Device Binding)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_token\": \"qr_sec_8f9a2c3d4e5f6a7b8c9d0e1f2a3b4c5d\",\n  \"device_id\": \"dev-iphone15-a89c7d12-34ef\",\n  \"device_name\": \"iPhone 15 Pro Max\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/qr-login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "qr-login"]
+            },
+            "description": "Thiết bị quét mã QR gửi kèm device_id. Thiết bị đầu tiên sẽ được bind. Thiết bị thứ 2 quét mã sẽ bị trả về 409 Conflict."
+          },
+          "response": [
+            {
+              "name": "Đăng nhập thành công (Lần đầu / đúng thiết bị)",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in_seconds\": 86400,\n  \"expires_at\": \"2026-10-21T14:30:00Z\",\n  \"bound_device_id\": \"dev-iphone15-a89c7d12-34ef\"\n}"
+            },
+            {
+              "name": "Lỗi thiết bị khác quét (409 Conflict)",
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Mã QR này đã được kích hoạt trên một thiết bị khác! Mỗi mã chỉ được phép sử dụng trên đúng 1 thiết bị.\",\n  \"error_code\": \"DEVICE_ALREADY_BOUND\"\n}"
+            },
+            {
+              "name": "Lỗi mã hết hạn 24h (403 Forbidden)",
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Mã QR đã hết hạn hiệu lực 24 giờ. Vui lòng liên hệ ban quản lý để được cấp mã mới.\",\n  \"error_code\": \"QR_EXPIRED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập tài khoản (Admin)",
           "request": {
             "method": "POST",
             "header": [
