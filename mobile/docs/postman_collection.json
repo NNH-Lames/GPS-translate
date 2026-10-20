@@ -1,0 +1,447 @@
+{
+  "info": {
+    "_postman_id": "gps-translate-collection-v1",
+    "name": "GPS-Translate & Quan 4 Audio Guide API",
+    "description": "Bộ sưu tập Postman Collection đầy đủ các API cho dự án GPS-Translate / Bản đồ ẩm thực & thuyết minh GPS Quận 4. Sẵn sàng import vào Postman để kiểm thử, chạy mock server hoặc demo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "sample_jwt_token_for_demo",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Đăng nhập tài khoản",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tourist@example.com\",\n  \"password\": \"Password123@\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Đăng nhập để nhận Bearer Token cho các thao tác thêm sửa xóa hoặc lưu yêu thích."
+          },
+          "response": [
+            {
+              "name": "Đăng nhập thành công",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 86400,\n  \"user\": {\n    \"id\": \"usr-01\",\n    \"name\": \"Nguyễn Văn A\",\n    \"email\": \"tourist@example.com\",\n    \"preferred_language\": \"vi\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Thông tin cá nhân (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": [
+            {
+              "name": "Lấy thông tin thành công",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": \"usr-01\",\n  \"name\": \"Nguyễn Văn A\",\n  \"email\": \"tourist@example.com\",\n  \"role\": \"user\",\n  \"saved_count\": 3\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. POI & Location",
+      "item": [
+        {
+          "name": "Tải toàn bộ POI (load-all)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/poi/load-all?lang=vi&category=Ốc&status=all",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "load-all"],
+              "query": [
+                { "key": "lang", "value": "vi", "description": "Ngôn ngữ (vi, en, zh, ja)" },
+                { "key": "category", "value": "Ốc", "description": "Lọc danh mục (Tùy chọn)" },
+                { "key": "status", "value": "all", "description": "all | online | offline | hybrid" }
+              ]
+            },
+            "description": "Endpoint chuẩn mà Frontend React/MapLibre của app đang gọi để hiển thị các điểm ghim trên bản đồ Quận 4."
+          },
+          "response": [
+            {
+              "name": "Danh sách POIs Quận 4",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"count\": 7,\n  \"lang\": \"vi\",\n  \"pois\": [\n    {\n      \"id\": \"q4-oc-dao\",\n      \"name\": \"Quán Ốc Đào Duy Từ\",\n      \"category\": \"Ốc\",\n      \"address\": \"Đào Duy Từ, Phường 5, Quận 4\",\n      \"rating\": 4.8,\n      \"reviews\": 284,\n      \"price\": \"50.000đ - 150.000đ\",\n      \"hours\": \"15:00 - 23:00\",\n      \"phone\": \"0908123456\",\n      \"tags\": [\"Ốc hương sốt bơ bắp\", \"Sò điệp phô mai\"],\n      \"status\": \"online\",\n      \"coordinates\": [106.6976, 10.7616],\n      \"audio_url\": \"/api/v1/audio/poi/q4-oc-dao?lang=vi\",\n      \"geofence_radius\": 35\n    },\n    {\n      \"id\": \"q4-banh-mi-tit\",\n      \"name\": \"Bánh Mì Kẹp Tít\",\n      \"category\": \"Bánh mì\",\n      \"address\": \"Đoàn Văn Bơ, Phường 14, Quận 4\",\n      \"rating\": 4.6,\n      \"reviews\": 142,\n      \"price\": \"20.000đ - 35.000đ\",\n      \"hours\": \"06:00 - 21:00\",\n      \"phone\": \"0912345678\",\n      \"tags\": [\"Pate gia truyền\", \"Bánh mì giòn rụm\"],\n      \"status\": \"online\",\n      \"coordinates\": [106.6981, 10.7586]\n    },\n    {\n      \"id\": \"q4-pha-lau\",\n      \"name\": \"Phá Lấu Cô Oanh\",\n      \"category\": \"Phá lấu\",\n      \"address\": \"200 Xóm Chiếu, Phường 14, Quận 4\",\n      \"rating\": 4.9,\n      \"reviews\": 580,\n      \"price\": \"30.000đ - 45.000đ\",\n      \"hours\": \"13:00 - 22:00\",\n      \"phone\": \"0903888222\",\n      \"tags\": [\"Đặc sản Quận 4\", \"Mắm me chua ngọt\"],\n      \"status\": \"online\",\n      \"coordinates\": [106.7011, 10.7583]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết một POI",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/poi/q4-oc-dao?lang=vi",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "q4-oc-dao"],
+              "query": [
+                { "key": "lang", "value": "vi" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Chi tiết Quán Ốc Đào",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"q4-oc-dao\",\n    \"name\": \"Quán Ốc Đào Duy Từ\",\n    \"category\": \"Ốc\",\n    \"address\": \"Đào Duy Từ, Phường 5, Quận 4\",\n    \"rating\": 4.8,\n    \"reviews\": 284,\n    \"price\": \"50.000đ - 150.000đ\",\n    \"hours\": \"15:00 - 23:00\",\n    \"phone\": \"0908123456\",\n    \"tags\": [\"Ốc hương sốt bơ bắp\", \"Sò điệp phô mai\"],\n    \"status\": \"online\",\n    \"coordinates\": [106.6976, 10.7616],\n    \"description\": \"Quán ốc danh tiếng bậc nhất Quận 4 với các món ốc tươi sống thơm ngon.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Tìm POI gần vị trí GPS hiện tại (Nearby)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/poi/nearby?lng=106.7011&lat=10.7583&radius=1000",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "nearby"],
+              "query": [
+                { "key": "lng", "value": "106.7011", "description": "Kinh độ hiện tại" },
+                { "key": "lat", "value": "10.7583", "description": "Vĩ độ hiện tại" },
+                { "key": "radius", "value": "1000", "description": "Bán kính quét (mét)" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Kết quả địa điểm lân cận",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"origin\": [106.7011, 10.7583],\n  \"items\": [\n    {\n      \"id\": \"q4-pha-lau\",\n      \"name\": \"Phá Lấu Cô Oanh\",\n      \"category\": \"Phá lấu\",\n      \"distance_meters\": 15.2,\n      \"coordinates\": [106.7011, 10.7583]\n    },\n    {\n      \"id\": \"q4-chao-be-quynh\",\n      \"name\": \"Cháo Sườn Bé Quỳnh\",\n      \"category\": \"Cháo\",\n      \"distance_meters\": 195.4,\n      \"coordinates\": [106.7024, 10.7595]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Tạo POI mới (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Phá Lấu Bò Cô Thảo\",\n  \"category\": \"Phá lấu\",\n  \"address\": \"243 Tôn Đản, Phường 15, Quận 4\",\n  \"price\": \"30.000đ - 50.000đ\",\n  \"hours\": \"13:30 - 22:00\",\n  \"phone\": \"0903112233\",\n  \"tags\": [\"Nước cốt dừa béo\", \"Bánh mì giòn\"],\n  \"status\": \"online\",\n  \"coordinates\": [106.7032, 10.7578],\n  \"description\": \"Phá lấu lòng bò đậm vị hầm nước dừa ăn kèm mắm me đặc trưng Quận 4.\",\n  \"geofence_radius\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/poi",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi"]
+            }
+          },
+          "response": [
+            {
+              "name": "Tạo POI thành công",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"poi-new-123\",\n    \"name\": \"Phá Lấu Bò Cô Thảo\",\n    \"status\": \"online\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cập nhật POI",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Quán Ốc Đào Duy Từ (Cập nhật giờ mở cửa)\",\n  \"category\": \"Ốc\",\n  \"address\": \"Đào Duy Từ, Phường 5, Quận 4\",\n  \"hours\": \"14:00 - 23:30\",\n  \"coordinates\": [106.6976, 10.7616]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/poi/q4-oc-dao",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "q4-oc-dao"]
+            }
+          }
+        },
+        {
+          "name": "Xóa POI",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/poi/q4-oc-dao",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "q4-oc-dao"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. GPS & Geofence (Kích hoạt Thuyết minh tự động)",
+      "item": [
+        {
+          "name": "Kiểm tra tọa độ & kích hoạt Geofence",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 10.7583,\n  \"longitude\": 106.7011,\n  \"lang\": \"vi\",\n  \"last_played_poi_id\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gps/geofence-check",
+              "host": ["{{baseUrl}}"],
+              "path": ["gps", "geofence-check"]
+            },
+            "description": "App gửi vị trí GPS theo thời gian thực (tần suất 5-10s/lần). Khi người dùng tiến gần một quán ăn/điểm di tích trong bán kính kích hoạt (geofence), server sẽ trả về lệnh kích hoạt bài thuyết minh âm thanh."
+          },
+          "response": [
+            {
+              "name": "Kích hoạt thành công điểm Phá Lấu Cô Oanh",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"should_trigger\": true,\n  \"distance_meters\": 18.5,\n  \"triggered_poi\": {\n    \"id\": \"q4-pha-lau\",\n    \"name\": \"Phá Lấu Cô Oanh\",\n    \"category\": \"Phá lấu\",\n    \"address\": \"200 Xóm Chiếu, Phường 14, Quận 4\"\n  },\n  \"audio_stream_url\": \"/api/v1/audio/poi/q4-pha-lau?lang=vi\",\n  \"auto_play_text\": \"Bạn đang ở gần Phá Lấu Cô Oanh, địa chỉ 200 Xóm Chiếu - một trong những hàng phá lấu nổi tiếng và lâu đời nhất Quận 4!\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Translation & Languages",
+      "item": [
+        {
+          "name": "Lấy danh sách ngôn ngữ hỗ trợ",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/translate/languages",
+              "host": ["{{baseUrl}}"],
+              "path": ["translate", "languages"]
+            }
+          },
+          "response": [
+            {
+              "name": "Danh sách ngôn ngữ",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "[\n  {\"code\": \"vi\", \"name\": \"Tiếng Việt\", \"flag\": \"🇻🇳\"},\n  {\"code\": \"en\", \"name\": \"English\", \"flag\": \"🇺🇸\"},\n  {\"code\": \"zh\", \"name\": \"中文 (Chinese)\", \"flag\": \"🇨🇳\"},\n  {\"code\": \"ja\", \"name\": \"日本語 (Japanese)\", \"flag\": \"🇯🇵\"},\n  {\"code\": \"ko\", \"name\": \"한국어 (Korean)\", \"flag\": \"🇰🇷\"}\n]"
+            }
+          ]
+        },
+        {
+          "name": "Dịch văn bản / thực đơn món ăn",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Ốc hương sốt bơ bắp kèm bánh mì nóng giòn\",\n  \"source_lang\": \"vi\",\n  \"target_lang\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/translate/text",
+              "host": ["{{baseUrl}}"],
+              "path": ["translate", "text"]
+            }
+          },
+          "response": [
+            {
+              "name": "Kết quả dịch thuật",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"original_text\": \"Ốc hương sốt bơ bắp kèm bánh mì nóng giòn\",\n  \"translated_text\": \"Sweet snails with corn butter sauce served with crispy hot baguette\",\n  \"source_lang\": \"vi\",\n  \"target_lang\": \"en\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Audio Guide & TTS",
+      "item": [
+        {
+          "name": "Stream âm thanh thuyết minh địa điểm",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/audio/poi/q4-oc-dao?lang=vi",
+              "host": ["{{baseUrl}}"],
+              "path": ["audio", "poi", "q4-oc-dao"],
+              "query": [
+                { "key": "lang", "value": "vi" }
+              ]
+            },
+            "description": "Stream trực tiếp file audio thuyết minh sang định dạng audio/mpeg cho trình phát âm thanh trên ứng dụng."
+          }
+        },
+        {
+          "name": "Sinh thuyết minh giọng nói từ văn bản (TTS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Chào mừng bạn đến với phố ẩm thực Vĩnh Khánh, Quận 4. Nơi đây quy tụ hơn 50 quán ốc và hải sản tươi sống hoạt động từ chiều tối tới đêm muộn.\",\n  \"lang\": \"vi\",\n  \"voice\": \"vi-VN-Standard-A\",\n  \"speed\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/audio/tts",
+              "host": ["{{baseUrl}}"],
+              "path": ["audio", "tts"]
+            }
+          },
+          "response": [
+            {
+              "name": "Sinh TTS thành công",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"audio_url\": \"/static/audio/tts-sample-vinhkhanh.mp3\",\n  \"duration_seconds\": 6.2\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Reviews & Bookmarks",
+      "item": [
+        {
+          "name": "Lấy danh sách đánh giá của POI",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/poi/q4-oc-dao/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "q4-oc-dao", "reviews"]
+            }
+          },
+          "response": [
+            {
+              "name": "Danh sách reviews",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "[\n  {\n    \"id\": \"rev-1\",\n    \"poi_id\": \"q4-oc-dao\",\n    \"user_name\": \"Trần Minh Hoàng\",\n    \"rating\": 5.0,\n    \"comment\": \"Quán làm sốt me rất đậm đà, ốc tươi nhảy tanh tách!\",\n    \"created_at\": \"2026-10-18T12:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Gửi đánh giá mới cho quán",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5.0,\n  \"comment\": \"Quán phục vụ nhanh, món ốc móng tay xào rau muống giòn ngon ngất ngây.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/poi/q4-oc-dao/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["poi", "q4-oc-dao", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Lấy danh sách quán đã lưu (Saved POIs)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/saved-pois",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "saved-pois"]
+            }
+          }
+        },
+        {
+          "name": "Lưu quán vào danh sách yêu thích",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"poi_id\": \"q4-pha-lau\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/saved-pois",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "saved-pois"]
+            }
+          }
+        },
+        {
+          "name": "Bỏ lưu quán khỏi danh sách yêu thích",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/saved-pois/q4-pha-lau",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "saved-pois", "q4-pha-lau"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

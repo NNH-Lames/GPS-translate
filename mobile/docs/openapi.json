@@ -1,0 +1,802 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "GPS Translate & POI Audio Guide API",
+    "description": "API phục vụ ứng dụng du lịch bản đồ ẩm thực Quận 4 và hệ thống thuyết minh GPS đa ngôn ngữ (GPS-Translate). Hỗ trợ tải dữ liệu POI, định vị lân cận, geofencing tự động kích hoạt audio guide, dịch thuật menu/nội dung và quản lý địa điểm.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "GPS-Translate Team",
+      "email": "support@gpstranslate.example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "https://api.gps-translate.com/api/v1",
+      "description": "Production Server"
+    }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "Xác thực và phân quyền người dùng" },
+    { "name": "POI & Location", "description": "Quản lý và tra cứu địa điểm ẩm thực, du lịch Quận 4" },
+    { "name": "GPS & Geofence", "description": "Kiểm tra tọa độ thực tế và kích hoạt audio theo bán kính GPS" },
+    { "name": "Translation", "description": "Dịch thuật đa ngôn ngữ nội dung POI và biển hiệu/menu" },
+    { "name": "Audio Guide", "description": "Thuyết minh tự động bằng giọng nói (TTS & Audio Stream)" },
+    { "name": "Reviews & Bookmarks", "description": "Đánh giá, bình luận và lưu địa điểm yêu thích" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Nhập JWT Token theo định dạng: Bearer <token>"
+      }
+    },
+    "schemas": {
+      "Coordinates": {
+        "type": "array",
+        "description": "[kinh_độ (longitude), vĩ_độ (latitude)]",
+        "items": { "type": "number" },
+        "example": [106.6976, 10.7616]
+      },
+      "POI": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "q4-oc-dao" },
+          "name": { "type": "string", "example": "Quán Ốc Đào Duy Từ" },
+          "category": { "type": "string", "example": "Ốc" },
+          "address": { "type": "string", "example": "Đào Duy Từ, Phường 5, Quận 4" },
+          "rating": { "type": "number", "format": "float", "example": 4.8 },
+          "reviews": { "type": "integer", "example": 284 },
+          "price": { "type": "string", "example": "50.000đ - 150.000đ" },
+          "hours": { "type": "string", "example": "15:00 - 23:00" },
+          "phone": { "type": "string", "example": "0908123456" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["Ốc hương sốt bơ bắp", "Sò điệp phô mai"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["online", "offline", "hybrid"],
+            "example": "online"
+          },
+          "coordinates": { "$ref": "#/components/schemas/Coordinates" },
+          "description": {
+            "type": "string",
+            "example": "Quán ốc danh tiếng bậc nhất Quận 4 với các món ốc tươi sống, nước chấm bơ tỏi thơm lừng."
+          },
+          "audio_url": {
+            "type": "string",
+            "example": "/api/v1/audio/poi/q4-oc-dao?lang=vi"
+          },
+          "geofence_radius": {
+            "type": "integer",
+            "description": "Bán kính kích hoạt audio tự động (mét)",
+            "example": 35
+          }
+        }
+      },
+      "PoiInput": {
+        "type": "object",
+        "required": ["name", "category", "address", "coordinates"],
+        "properties": {
+          "name": { "type": "string", "example": "Phá Lấu Bò Cô Thảo" },
+          "category": { "type": "string", "example": "Phá lấu" },
+          "address": { "type": "string", "example": "243 Tôn Đản, Phường 15, Quận 4" },
+          "price": { "type": "string", "example": "30.000đ - 50.000đ" },
+          "hours": { "type": "string", "example": "13:30 - 22:00" },
+          "phone": { "type": "string", "example": "0903112233" },
+          "tags": { "type": "array", "items": { "type": "string" }, "example": ["Nước cốt dừa béo", "Bánh mì giòn"] },
+          "status": { "type": "string", "enum": ["online", "offline", "hybrid"], "example": "online" },
+          "coordinates": { "$ref": "#/components/schemas/Coordinates" },
+          "description": { "type": "string", "example": "Phá lấu lòng bò đậm vị hầm nước dừa ăn kèm mắm me đặc trưng Quận 4." },
+          "geofence_radius": { "type": "integer", "example": 30 }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "rev-101" },
+          "poi_id": { "type": "string", "example": "q4-oc-dao" },
+          "user_name": { "type": "string", "example": "Nguyễn Văn A" },
+          "rating": { "type": "number", "example": 5.0 },
+          "comment": { "type": "string", "example": "Ốc rất tươi, phục vụ nhanh, vị trí ngay trung tâm ẩm thực!" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-10-18T19:30:00Z" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string", "example": "Không tìm thấy dữ liệu yêu cầu" },
+          "error_code": { "type": "string", "example": "RESOURCE_NOT_FOUND" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Đăng nhập người dùng",
+        "description": "Xác thực tài khoản và trả về JWT Token cho phiên làm việc",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string", "example": "tourist@example.com" },
+                  "password": { "type": "string", "example": "Password123@" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "access_token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+                    "token_type": { "type": "string", "example": "Bearer" },
+                    "expires_in": { "type": "integer", "example": 86400 },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "example": "usr-01" },
+                        "name": { "type": "string", "example": "Nguyễn Văn A" },
+                        "email": { "type": "string", "example": "tourist@example.com" },
+                        "preferred_language": { "type": "string", "example": "vi" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sai thông tin đăng nhập",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Lấy thông tin tài khoản hiện tại",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Thông tin cá nhân người dùng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string", "example": "usr-01" },
+                    "name": { "type": "string", "example": "Nguyễn Văn A" },
+                    "email": { "type": "string", "example": "tourist@example.com" },
+                    "role": { "type": "string", "example": "user" },
+                    "saved_count": { "type": "integer", "example": 5 }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/poi/load-all": {
+      "get": {
+        "tags": ["POI & Location"],
+        "summary": "Tải toàn bộ danh sách POI (Điểm du lịch/ẩm thực)",
+        "description": "Endpoint chính thức được ứng dụng Mobile gọi để lấy danh sách POI hiển thị lên bản đồ MapLibre.",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "description": "Mã ngôn ngữ nội dung (vi, en, zh, ja, ko)",
+            "schema": { "type": "string", "default": "vi" }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "description": "Lọc theo danh mục món ăn (Ốc, Bánh mì, Phá lấu, Cháo...)",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Lọc trạng thái hoạt động",
+            "schema": { "type": "string", "enum": ["all", "online", "offline", "hybrid"], "default": "all" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách các POI hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "count": { "type": "integer", "example": 7 },
+                    "lang": { "type": "string", "example": "vi" },
+                    "pois": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/POI" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poi/{id}": {
+      "get": {
+        "tags": ["POI & Location"],
+        "summary": "Chi tiết một địa điểm POI",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID định danh POI (VD: q4-oc-dao)",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "description": "Ngôn ngữ chi tiết",
+            "schema": { "type": "string", "default": "vi" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết POI",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/POI" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy địa điểm",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      },
+      "put": {
+        "tags": ["POI & Location"],
+        "summary": "Cập nhật thông tin POI",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID của POI cần cập nhật",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PoiInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cập nhật thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/POI" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["POI & Location"],
+        "summary": "Xóa một địa điểm POI",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Xóa POI thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Đã xóa địa điểm thành công" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poi": {
+      "post": {
+        "tags": ["POI & Location"],
+        "summary": "Tạo mới một địa điểm ẩm thực/du lịch",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PoiInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo POI thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/POI" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poi/nearby": {
+      "get": {
+        "tags": ["POI & Location"],
+        "summary": "Tìm các POI lân cận vị trí GPS hiện tại",
+        "description": "Dùng tọa độ của người dùng để tính khoảng cách và sắp xếp từ gần đến xa",
+        "parameters": [
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "description": "Kinh độ hiện tại (Longitude)",
+            "schema": { "type": "number", "example": 106.7011 }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "description": "Vĩ độ hiện tại (Latitude)",
+            "schema": { "type": "number", "example": 10.7583 }
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "required": false,
+            "description": "Bán kính quét (mét, mặc định 1000m)",
+            "schema": { "type": "integer", "default": 1000 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách các POI lân cận kèm khoảng cách mét",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "origin": { "$ref": "#/components/schemas/Coordinates" },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          { "$ref": "#/components/schemas/POI" },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "distance_meters": { "type": "number", "example": 125.4 }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gps/geofence-check": {
+      "post": {
+        "tags": ["GPS & Geofence"],
+        "summary": "Kiểm tra kích hoạt Thuyết minh tự động theo GPS",
+        "description": "Ứng dụng mobile định kỳ gửi tọa độ GPS hiện tại lên. Nếu người dùng bước vào bán kính của một POI (ví dụ: cách dưới 35m), hệ thống kích hoạt tự động bài thuyết minh cho POI đó.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["latitude", "longitude"],
+                "properties": {
+                  "latitude": { "type": "number", "example": 10.7583 },
+                  "longitude": { "type": "number", "example": 106.7011 },
+                  "lang": { "type": "string", "example": "vi" },
+                  "last_played_poi_id": { "type": "string", "example": "q4-hu-tieu" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kết quả quét Geofence",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "should_trigger": { "type": "boolean", "example": true },
+                    "triggered_poi": { "$ref": "#/components/schemas/POI" },
+                    "distance_meters": { "type": "number", "example": 18.5 },
+                    "audio_stream_url": { "type": "string", "example": "/api/v1/audio/poi/q4-pha-lau?lang=vi" },
+                    "auto_play_text": { "type": "string", "example": "Chào mừng bạn đến với Phá Lấu Cô Oanh tại 200 Xóm Chiếu..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/translate/text": {
+      "post": {
+        "tags": ["Translation"],
+        "summary": "Dịch văn bản / Thực đơn món ăn sang ngôn ngữ du khách",
+        "description": "Hỗ trợ dịch nhanh tên món, biển hiệu hoặc mô tả lịch sử văn hóa sang các ngôn ngữ du lịch.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["text", "target_lang"],
+                "properties": {
+                  "text": { "type": "string", "example": "Ốc hương sốt bơ bắp kèm bánh mì nóng giòn" },
+                  "source_lang": { "type": "string", "example": "vi" },
+                  "target_lang": { "type": "string", "example": "en" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kết quả dịch thuật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "original_text": { "type": "string", "example": "Ốc hương sốt bơ bắp kèm bánh mì nóng giòn" },
+                    "translated_text": { "type": "string", "example": "Sweet snails with corn butter sauce served with crispy hot baguette" },
+                    "source_lang": { "type": "string", "example": "vi" },
+                    "target_lang": { "type": "string", "example": "en" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/translate/languages": {
+      "get": {
+        "tags": ["Translation"],
+        "summary": "Danh sách các ngôn ngữ được hỗ trợ",
+        "responses": {
+          "200": {
+            "description": "Danh sách ngôn ngữ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "code": { "type": "string", "example": "vi" },
+                      "name": { "type": "string", "example": "Tiếng Việt" },
+                      "flag": { "type": "string", "example": "🇻🇳" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audio/poi/{id}": {
+      "get": {
+        "tags": ["Audio Guide"],
+        "summary": "Lấy luồng âm thanh thuyết minh (Audio Guide Stream)",
+        "description": "Trả về file âm thanh thuyết minh địa điểm theo ngôn ngữ đã chọn",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID địa điểm",
+            "schema": { "type": "string", "example": "q4-oc-dao" }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "description": "Ngôn ngữ phát âm thanh",
+            "schema": { "type": "string", "default": "vi" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File âm thanh audio/mpeg",
+            "content": {
+              "audio/mpeg": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "404": {
+            "description": "Không có sẵn audio cho địa điểm này",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/audio/tts": {
+      "post": {
+        "tags": ["Audio Guide"],
+        "summary": "Tạo âm thanh thuyết minh tự động từ văn bản (TTS)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                  "text": { "type": "string", "example": "Chào mừng bạn đến với phố ẩm thực Vĩnh Khánh, Quận 4." },
+                  "lang": { "type": "string", "example": "vi" },
+                  "voice": { "type": "string", "example": "vi-VN-Standard-A" },
+                  "speed": { "type": "number", "example": 1.0 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trả về thông tin audio vừa sinh",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "audio_url": { "type": "string", "example": "/static/audio/tts-sample-uuid.mp3" },
+                    "duration_seconds": { "type": "number", "example": 4.8 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poi/{id}/reviews": {
+      "get": {
+        "tags": ["Reviews & Bookmarks"],
+        "summary": "Lấy danh sách đánh giá của POI",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "q4-oc-dao" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách đánh giá",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Review" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Reviews & Bookmarks"],
+        "summary": "Gửi đánh giá và bình luận mới",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "q4-oc-dao" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rating", "comment"],
+                "properties": {
+                  "rating": { "type": "number", "minimum": 1, "maximum": 5, "example": 5.0 },
+                  "comment": { "type": "string", "example": "Món ăn ngon tuyệt vời, nước sốt chuẩn vị Sài Gòn!" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đánh giá đã được ghi nhận",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "review": { "$ref": "#/components/schemas/Review" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/saved-pois": {
+      "get": {
+        "tags": ["Reviews & Bookmarks"],
+        "summary": "Lấy danh sách các địa điểm đã lưu của người dùng",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Danh sách POI đã lưu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/POI" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Reviews & Bookmarks"],
+        "summary": "Lưu địa điểm vào danh sách yêu thích",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["poi_id"],
+                "properties": {
+                  "poi_id": { "type": "string", "example": "q4-pha-lau" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Đã lưu địa điểm vào danh sách yêu thích" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/saved-pois/{id}": {
+      "delete": {
+        "tags": ["Reviews & Bookmarks"],
+        "summary": "Bỏ lưu địa điểm khỏi danh sách yêu thích",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "q4-pha-lau" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xóa khỏi danh sách yêu thích",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Đã xóa địa điểm khỏi danh mục yêu thích" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
